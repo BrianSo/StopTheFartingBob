@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
 /// The Base Class that all charactor will be inherited
-public class BaseCharactor : MonoBehaviour {
+public class BaseCharactor : NetworkBehaviour {
 
 	public float movementSpeed = 5f;
 
@@ -20,7 +21,9 @@ public class BaseCharactor : MonoBehaviour {
 	}
 
 	void FixedUpdate(){
-		HandleControl();
+		if(isLocalPlayer){
+			HandleControl();	
+		}
 	}
 
 	void HandleControl(){
@@ -32,13 +35,11 @@ public class BaseCharactor : MonoBehaviour {
 		if(Physics.Raycast(ray, out hit, raycastLength)){
 			Debug.Log(hit.collider.name);
 			Debug.Log(hit.point);
-			Debug.DrawRay(ray.origin, hit.point - ray.origin, Color.green);
+			//Debug.DrawRay(ray.origin, hit.point - ray.origin, Color.green);
+			Debug.DrawLine(transform.position,hit.point,Color.cyan,0.01f);
 		}else{
-			Debug.DrawRay(ray.origin, ray.direction * raycastLength, Color.green);
+			//Debug.DrawRay(ray.origin, ray.direction * raycastLength, Color.green);
 		}
-
-		
-
 		this.transform.position += new Vector3(x,y,0) * Time.deltaTime * movementSpeed;
 	}
 }
