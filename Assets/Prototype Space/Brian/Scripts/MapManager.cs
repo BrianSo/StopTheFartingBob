@@ -24,5 +24,6 @@ public class MapManager : MonoBehaviour {
         }
 
 		generator.GenerateMap(width, height, seed.GetHashCode());
+		generator.ConstructMapObjects();
 	}
 }

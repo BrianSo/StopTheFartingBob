@@ -3,14 +3,18 @@ using System.Collections.Generic;
 
 public abstract class MapGenerator: MonoBehaviour{
 
+	public Tile[] tiles;
+
 	public const int TILE_NOTHING = 0;
 	public const int TILE_GLASS = 1;
-	public const int TILE_WALL_TREE = 0x10;
-	public const int TILE_WALL_FENCE = 0x20;
+	public const int TILE_WALL_TREE = 2;
+	public const int TILE_WALL_FENCE = 3;
 
-	public const int OBJ_NOTHING = 0x0;
-	public const int OBJ_BUSHES = 0x1;
-	public const int OBJ_PLANTS = 0x2;
+	public GameObject[] gameObjects;
+
+	public const int OBJ_NOTHING = 0;
+	public const int OBJ_BUSHES = 1;
+	public const int OBJ_PLANTS = 2;
 
 	public struct Block{
 		public int tileNumber;
@@ -21,19 +25,40 @@ public abstract class MapGenerator: MonoBehaviour{
 
 	public bool drawGizmo = false;
 
+	List<GameObject> mapObjects;
+	void Start(){
+		middlewares = new List<MapGenerationMiddleware>();
+		mapObjects = new List<GameObject>();
+	}
+	// create and generate a new map in data structure, by the MapGenerationMiddleware used.
+	// setup the middleware in Styling();
 	public Block[,] GenerateMap(int width, int height, int seed){
 		random = new System.Random(seed);
 		map = new Block[width,height];
-		// for(int x = 0; x < 20; x++){
-		// 	for(int y = 0; y <20; y++){
-		// 		if(x == 0 || y == 0 || x ==19 || y ==19){
-		// 			map[x,y] = new Block();
-		// 		}
-		// 	}
-		// }
-		middlewares = new List<MapGenerationMiddleware>();
+		middlewares.Clear();
 		Styling();
 		return map;
+	}
+
+	
+	// create the gameobjects according to the map generated
+	public void ConstructMapObjects(){
+		foreach(GameObject obj in mapObjects){
+			Destroy(obj);
+		}
+		mapObjects.Clear();
+		int width = map.GetLength(0);
+		int height = map.GetLength(1);
+		for (int x = 0; x < width; x ++) {
+			for (int y = 0; y < height; y ++) {
+				if(map[x,y].tileNumber == TILE_NOTHING){
+					continue;
+				}
+				GameObject generated = tiles[map[x,y].tileNumber - 1].GetVariation(random);
+				generated.transform.position = new Vector3(-width/2 + x + .5f, -height/2 + y+.5f,0);
+				mapObjects.Add(generated);
+			}
+		}
 	}
 
 	public abstract void Styling();
@@ -65,6 +90,7 @@ public abstract class MapGenerator: MonoBehaviour{
 			int height = map.GetLength(1);
 			for (int x = 0; x < width; x ++) {
                 for (int y = 0; y < height; y ++) {
+					// draw tiles
 					switch(map[x,y].tileNumber){
 						case TILE_GLASS:
 							Gizmos.color = Color.gray;
@@ -83,6 +109,7 @@ public abstract class MapGenerator: MonoBehaviour{
                     Vector3 pos = new Vector3(-width/2 + x + .5f, -height/2 + y+.5f,0);
                     Gizmos.DrawCube(pos,Vector3.one);
 
+					// draw objects
 					switch(map[x,y].objNumber){
 						case OBJ_BUSHES:
 							Gizmos.color = Color.cyan;

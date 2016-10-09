@@ -2,6 +2,9 @@ using System;
 
 public class MockGenerator : MapGenerator
 {
+
+    public bool useRandom = false;
+
     private class MockStyler : MapGenerationMiddleware
     {
         protected override void Process()
@@ -13,8 +16,8 @@ public class MockGenerator : MapGenerator
             _ = TILE_GLASS;
             T = TILE_WALL_TREE;
             H = TILE_WALL_FENCE;
-            M = TILE_NOTHING;
-            Q = TILE_NOTHING;
+            M = TILE_GLASS;
+            Q = TILE_GLASS;
             int[,] tileMap = new int[,] {
                 {T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T,T},
                 {T,_,_,_,_,_,M,_,_,_,_,M,T,_,_,_,_,_,_,T},
@@ -75,7 +78,47 @@ public class MockGenerator : MapGenerator
 
         //public override void OnDrawGizmos(){}
     }
+
+    private class RandomStyler : MapGenerationMiddleware{
+        
+        protected override void Process()
+        {
+            for(int x = 0; x < 20; x++){
+                for(int y = 0; y < 20; y++){
+                    if(x == 0 || x == 19 || y == 0 || y== 19){
+                        map[x,y].tileNumber = TILE_WALL_TREE;
+                    }else{
+                        map[x,y].tileNumber = TILE_GLASS;
+                    }
+                }
+            }
+            for(int i = 0;i < 5; i++){
+                int x = random.Next(2,17);
+                int y = random.Next(2,17);
+                map[x,y].tileNumber = TILE_WALL_TREE;
+            }
+            for(int i = 0;i < 5; i++){
+                int x = random.Next(2,17);
+                int y = random.Next(2,17);
+                map[x,y].tileNumber = TILE_WALL_FENCE;
+            }
+            for(int i = 0;i < 5; i++){
+                int x = random.Next(1,18);
+                int y = random.Next(1,18);
+                map[x,y].objNumber = OBJ_BUSHES;
+            }
+            for(int i = 0;i < 5; i++){
+                int x = random.Next(1,18);
+                int y = random.Next(1,18);
+                map[x,y].objNumber = OBJ_PLANTS;
+            }
+        }
+    }
     public override void Styling(){
-        Use(new MockStyler());
+        if(useRandom){
+            Use(new RandomStyler());
+        }else{
+            Use(new MockStyler());
+        }
     }
 }
