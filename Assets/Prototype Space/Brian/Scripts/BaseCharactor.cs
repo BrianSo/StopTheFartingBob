@@ -9,9 +9,11 @@ public class BaseCharactor : NetworkBehaviour {
 
 
 	private float raycastLength = 1000f;
+	private Rigidbody rb;
 
 	// Use this for initialization
 	void Start () {
+		rb = GetComponent<Rigidbody>();
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
 	
@@ -30,16 +32,10 @@ public class BaseCharactor : NetworkBehaviour {
 		var x = Input.GetAxis("Horizontal");
 		var y = Input.GetAxis("Vertical");
 
-		RaycastHit hit;
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		if(Physics.Raycast(ray, out hit, raycastLength)){
-			Debug.Log(hit.collider.name);
-			Debug.Log(hit.point);
-			//Debug.DrawRay(ray.origin, hit.point - ray.origin, Color.green);
-			Debug.DrawLine(transform.position,hit.point,Color.cyan,0.01f);
-		}else{
-			//Debug.DrawRay(ray.origin, ray.direction * raycastLength, Color.green);
-		}
-		this.transform.position += new Vector3(x,y,0) * Time.deltaTime * movementSpeed;
+		Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,Input.mousePosition.y, Camera.main.transform.position.y));
+		Debug.DrawLine(transform.position,pos,Color.cyan,0.01f);
+
+		this.transform.position += new Vector3(x,0,y) * Time.deltaTime * movementSpeed;
+		//rb.MovePosition(transform.position + new Vector3(x,0,y) * Time.deltaTime * movementSpeed);
 	}
 }
