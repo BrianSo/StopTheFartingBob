@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MapManager : MonoBehaviour {
 
-	public MapManager singleton;
+	public static MapManager singleton;
 
 	public float tileSize = 32f;
 
@@ -41,6 +41,9 @@ public class MapManager : MonoBehaviour {
             seed = Time.time.ToString();
         }
 
+		if(map){
+			Destroy(map);
+		}
 		generator.GenerateMap(width, height, seed.GetHashCode());
 		map = generator.ConstructMapObjects(out mapTiles);
 	}
