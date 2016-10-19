@@ -35,9 +35,6 @@ public class BaseCharactor : NetworkBehaviour {
 		Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,Input.mousePosition.y, Camera.main.transform.position.y));
 		Debug.DrawLine(transform.position,pos,Color.cyan,0.01f);
 
-		//this.transform.position += new Vector3(x,0,y) * Time.deltaTime * movementSpeed;
-		
-		//rb.MovePosition(transform.position + new Vector3(x,0,y) * Time.deltaTime * movementSpeed);
 		rb.velocity = new Vector3(x,0,y) * movementSpeed;
 	}
 }
