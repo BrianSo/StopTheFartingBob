@@ -10,16 +10,20 @@ public class BaseCharactor : NetworkBehaviour {
 
 	private float raycastLength = 1000f;
 	private Rigidbody rb;
+	Vector3 mousePos;
+	Camera viewCamera;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
+		viewCamera = Camera.main;
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+		mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
+		transform.LookAt (mousePos + Vector3.up * transform.position.y);
 	}
 
 	void FixedUpdate(){
@@ -29,11 +33,11 @@ public class BaseCharactor : NetworkBehaviour {
 	}
 
 	void HandleControl(){
-		var x = Input.GetAxis("Horizontal");
-		var y = Input.GetAxis("Vertical");
+		var x = Input.GetAxisRaw("Horizontal");
+		var y = Input.GetAxisRaw("Vertical");
 
-		Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x,Input.mousePosition.y, Camera.main.transform.position.y));
-		Debug.DrawLine(transform.position,pos,Color.cyan,0.01f);
+		viewCamera.transform.position = 0.3f*mousePos + 0.7f*transform.position;
+		viewCamera.transform.position = new Vector3(viewCamera.transform.position.x, 10, viewCamera.transform.position.z);
 
 		rb.velocity = new Vector3(x,0,y) * movementSpeed;
 	}
