@@ -1,4 +1,4 @@
-﻿Shader "Custom/Stencil Object"
+﻿Shader "Custom/Stencil Darken"
 {
 	Properties
 	{
@@ -23,7 +23,7 @@
 		ZWrite Off
 		Blend One OneMinusSrcAlpha
 
-		// Second pass for areas in field of view
+		// First pass for areas in field of view
 		Pass
 		{
 
