@@ -22,8 +22,10 @@ public class BaseCharactor : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
-		transform.LookAt (mousePos + Vector3.up * transform.position.y);
+		if(isLocalPlayer){
+			mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
+			transform.LookAt (mousePos + Vector3.up * transform.position.y);
+		}
 	}
 
 	void FixedUpdate(){

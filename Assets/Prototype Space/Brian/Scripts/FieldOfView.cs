@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
 
-public class FieldOfView : MonoBehaviour {
+public class FieldOfView : NetworkBehaviour {
 
 	public float viewRadius;
 	[Range(0, 360)]
@@ -38,7 +39,9 @@ public class FieldOfView : MonoBehaviour {
 	}
 
 	void LateUpdate() {
-		DrawFieldOfView();
+		if (isLocalPlayer) {
+			DrawFieldOfView ();
+		}
 	}
 
 	void FindVisibleTargets() {
