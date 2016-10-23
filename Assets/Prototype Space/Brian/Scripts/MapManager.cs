@@ -12,8 +12,9 @@ public class MapManager : MonoBehaviour {
 
 	public MapGenerator generator;
 
-	public string seed;
-    public bool useRandomSeed;
+    public string seed;
+
+	public Map sourceMap;
 
 	public GameObject map;
 	public List<GameObject> units;
@@ -34,14 +35,12 @@ public class MapManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		GenerateMap();
+		
 	}
-	
+	public string getRandomSeed(){
+		return Time.time.ToString();
+	}
 	public void GenerateMap(){
-		if (useRandomSeed) {
-            seed = Time.time.ToString();
-        }
-
 		if(map){
 			Destroy(map);
 		}

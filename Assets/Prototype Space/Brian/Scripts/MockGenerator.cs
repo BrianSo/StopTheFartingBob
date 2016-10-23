@@ -1,3 +1,4 @@
+using UnityEngine;
 using System;
 
 public class MockGenerator : MapGenerator
@@ -9,7 +10,7 @@ public class MockGenerator : MapGenerator
     {
         protected override void Process()
         {
-            // asume width = 20, height = 20;
+            // assume width = 20, height = 20;
 
             int _, T, H, M, Q;
 
@@ -70,10 +71,13 @@ public class MockGenerator : MapGenerator
 
             for(int x = 0; x < 20; x++){
                 for(int y = 0; y < 20; y++){
-                    map[x,y].tileNumber = tileMap[x,y];
-                    map[x,y].objNumber = objMap[x,y];
+                    map.blocks[x,y].tileNumber = tileMap[x,y];
+                    map.blocks[x,y].objNumber = objMap[x,y];
                 }
             }
+
+            map.startingPoints.Add(new Vector2(2,2));
+            map.startingPoints.Add(new Vector2(18,18));
         }
 
         //public override void OnDrawGizmos(){}
@@ -86,31 +90,31 @@ public class MockGenerator : MapGenerator
             for(int x = 0; x < 20; x++){
                 for(int y = 0; y < 20; y++){
                     if(x == 0 || x == 19 || y == 0 || y== 19){
-                        map[x,y].tileNumber = TILE_WALL_TREE;
+                        map.blocks[x,y].tileNumber = TILE_WALL_TREE;
                     }else{
-                        map[x,y].tileNumber = TILE_GLASS;
+                        map.blocks[x,y].tileNumber = TILE_GLASS;
                     }
                 }
             }
             for(int i = 0;i < 5; i++){
                 int x = random.Next(2,17);
                 int y = random.Next(2,17);
-                map[x,y].tileNumber = TILE_WALL_TREE;
+                map.blocks[x,y].tileNumber = TILE_WALL_TREE;
             }
             for(int i = 0;i < 5; i++){
                 int x = random.Next(2,17);
                 int y = random.Next(2,17);
-                map[x,y].tileNumber = TILE_WALL_FENCE;
+                map.blocks[x,y].tileNumber = TILE_WALL_FENCE;
             }
             for(int i = 0;i < 5; i++){
                 int x = random.Next(1,18);
                 int y = random.Next(1,18);
-                map[x,y].objNumber = OBJ_BUSHES;
+                map.blocks[x,y].objNumber = OBJ_BUSHES;
             }
             for(int i = 0;i < 5; i++){
                 int x = random.Next(1,18);
                 int y = random.Next(1,18);
-                map[x,y].objNumber = OBJ_PLANTS;
+                map.blocks[x,y].objNumber = OBJ_PLANTS;
             }
         }
     }
