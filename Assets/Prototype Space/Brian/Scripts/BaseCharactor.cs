@@ -5,6 +5,8 @@ using System.Collections;
 /// The Base Class that all charactor will be inherited
 public class BaseCharactor : NetworkBehaviour {
 
+	public static BaseCharactor localCharactor;
+
 	public float movementSpeed = 5f;
 
 
@@ -15,9 +17,17 @@ public class BaseCharactor : NetworkBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		if(isLocalPlayer){
+			localCharactor = this;
+		}
 		rb = GetComponent<Rigidbody>();
 		viewCamera = Camera.main;
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+	}
+	void Destroy(){
+		if(localCharactor == this){
+			localCharactor = null;
+		}
 	}
 	
 	// Update is called once per frame

@@ -40,12 +40,13 @@ public abstract class MapGenerator: MonoBehaviour{
 
 	
 	// create the gameobjects according to the map generated
-	public GameObject ConstructMapObjects(out GameObject[,] mapGameObjects){
+	public GameObject ConstructMapObjects(out GameObject[,] mapGameObjects, out List<GameObject> unitGameObjects){
 		int width = map.GetLength(0);
 		int height = map.GetLength(1);
 
 		mapGameObjects = new GameObject[width,height];
 		GameObject mapGameObject = new GameObject("Map");
+		unitGameObjects = new List<GameObject>();
 
 		for (int x = 0; x < width; x ++) {
 			for (int y = 0; y < height; y ++) {
@@ -58,7 +59,18 @@ public abstract class MapGenerator: MonoBehaviour{
 				generated.transform.parent = mapGameObject.transform;
 			}
 		}
-		mapGameObject.transform.position = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		Vector3 positionFix = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		for (int x = 0; x < width; x ++) {
+			for (int y = 0; y < height; y ++) {
+				if(map[x,y].objNumber == OBJ_NOTHING){
+					continue;
+				}
+				GameObject generated = Instantiate(gameObjects[map[x,y].objNumber - 1]);
+				generated.transform.position = new Vector3(x, 0, y) + positionFix;
+				unitGameObjects.Add(generated);
+			}
+		}
+		mapGameObject.transform.position = positionFix;
 		return mapGameObject;
 	}
 

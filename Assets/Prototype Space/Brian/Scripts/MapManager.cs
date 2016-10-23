@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class MapManager : MonoBehaviour {
 
@@ -16,6 +16,7 @@ public class MapManager : MonoBehaviour {
     public bool useRandomSeed;
 
 	public GameObject map;
+	public List<GameObject> units;
 	public GameObject[,] mapTiles;
 
 	void Awake(){
@@ -44,7 +45,11 @@ public class MapManager : MonoBehaviour {
 		if(map){
 			Destroy(map);
 		}
+		if(units != null)
+		foreach(GameObject gameObject in units){
+			Destroy(gameObject);
+		}
 		generator.GenerateMap(width, height, seed.GetHashCode());
-		map = generator.ConstructMapObjects(out mapTiles);
+		map = generator.ConstructMapObjects(out mapTiles, out units);
 	}
 }
