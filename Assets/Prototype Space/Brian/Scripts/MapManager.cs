@@ -20,6 +20,17 @@ public class MapManager : MonoBehaviour {
 	public List<GameObject> units;
 	public GameObject[,] mapTiles;
 
+
+	Vector3 GetStartingPosition(){
+		Vector2 pt = sourceMap.GetRoundRobinStartingPoint();
+		return new Vector3(pt.x, 0, pt.y);
+	}
+
+	Vector3 GetItemPosition(){
+		Vector2 pt = sourceMap.GetRandomItemPosition();
+		return new Vector3(pt.x, 0, pt.y);
+	}
+
 	void Awake(){
 		//singleton pattern
 		if (singleton == null)

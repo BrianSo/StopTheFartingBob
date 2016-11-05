@@ -13,7 +13,7 @@ public class NetworkUnit : NetworkBehaviour {
 
 	[ClientRpc]
 	public void RpcSetPlayer(GameObject p){
-		Debug.Log("set player");
+		
 		player = p.GetComponent<Player>();
 		OnPlayerChanged();
 	}

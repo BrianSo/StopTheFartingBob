@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Collections.Generic;
+using System.Collections;
 
 /// GameManager responsible to each game
 /// It will be Destroyed after the game end
@@ -9,41 +9,50 @@ using System.Collections.Generic;
 public class GameManager : NetworkBehaviour {
     public static GameManager singleton;
 
-	GameObject gardener;
-	GameObject bob;
-
-	public int GameState = IDLE;
-	const int IDLE = 0;
-	const int WAITING = 1;
-	const int PLAYING = 2;
-	const int END = 3;
 	
+	GameObject bobPlayer;
+	GameObject gardenerPlayer;
+
+	GameObject bob;
+	GameObject gardener;
+
+	public GameObject bobPrefab;
+	public GameObject gardenerPrefab;
+
+	Vector3 bobHintPosition = new Vector3(-10,0,-30);
+	Vector3 gardenerHintPosition = new Vector3(-20,0,-30);
+
+	bool isGameStarted = false;
 
 	public void Synchronize(){
-		RpcSynchronize(bob, gardener);
+		RpcSynchronize(bobPlayer, gardenerPlayer);
 	}
 	[ClientRpc]
 	public void RpcSynchronize(GameObject bob, GameObject gardener){
-		this.bob = bob;
-		this.gardener = gardener;
+		this.bobPlayer = bob;
+		this.gardenerPlayer = gardener;
 	}
 
 	public void OnServerAddPlayer(GameObject player){
 		//assign charactor to player
-		if(bob == null){
+		if(bobPlayer == null){
 			player.GetComponent<Player>().charactor = Player.BOB;
-			bob = player;
-		}else{
+			bobPlayer = player;
+		}else if(gardenerPlayer == null){
 			player.GetComponent<Player>().charactor = Player.GARNDERER;
-			gardener = player;
+			gardenerPlayer = player;
 		}
+
+		StartCoroutine(CheckStartGame());
 	}
 	public void OnServerRemovePlayer(GameObject player){
 		//clean up values
-		if(bob == player){
-			bob = null;
-		}else if(gardener == player){
-			gardener = null;
+		if(bobPlayer == player){
+			bobPlayer = null;
+			Reset();
+		}else if(gardenerPlayer == player){
+			gardenerPlayer = null;
+			Reset();
 		}
 	}
 
@@ -58,12 +67,12 @@ public class GameManager : NetworkBehaviour {
 	void Start(){
 		MyNetworkManager.singleton.delegateOnServerAddPlayer += OnServerAddPlayer;
 		MyNetworkManager.singleton.delegateOnServerRemovePlayer += OnServerRemovePlayer;
-		//StartCoroutine(StartGameCoroutine());
 	}
-	System.Collections.IEnumerator StartGameCoroutine() {
-		yield return new WaitForSeconds(1);
-		StartGame();
-		yield return null;
+
+	void Reset(){
+		NetworkServer.Destroy(bob);
+		NetworkServer.Destroy(gardener);
+		isGameStarted = false;
 	}
 
 	void Destroy(){
@@ -72,6 +81,27 @@ public class GameManager : NetworkBehaviour {
 			singleton = null;
 		MyNetworkManager.singleton.delegateOnServerAddPlayer -= OnServerAddPlayer;
 		MyNetworkManager.singleton.delegateOnServerRemovePlayer -= OnServerRemovePlayer;
+	}
+	
+
+	IEnumerator CheckStartGame(){
+		if(!isServer)
+			yield break;
+		yield return new WaitForSeconds(0.5f);
+		if(bobPlayer != null && gardenerPlayer != null){
+			ShowHintScene();
+		}
+	}
+	
+
+	void ShowHintScene(){
+		bob = Instantiate(bobPrefab,bobHintPosition,Quaternion.identity) as GameObject;
+		NetworkServer.SpawnWithClientAuthority(bob, bobPlayer);
+		gardener = Instantiate(gardenerPrefab, gardenerHintPosition, Quaternion.identity) as GameObject;
+		NetworkServer.SpawnWithClientAuthority(gardener, gardenerPlayer);
+
+		bob.GetComponent<NetworkUnit>().RpcSetPlayer(bobPlayer);
+		gardener.GetComponent<NetworkUnit>().RpcSetPlayer(gardenerPlayer);
 	}
 
 	[Server]
@@ -82,7 +112,7 @@ public class GameManager : NetworkBehaviour {
 
 	[Server]
 	void PlaceCharactors(){
-		
+
 	}
 
 	[ClientRpc]

@@ -21,11 +21,11 @@ public class Map{
         itemPositions = new List<Vector2>();
     }
 
-    public Vector2 GetRandomStartingPoint(){
-        int index = Random.Range(0,startingPoints.Count - 1);
-        Vector2 v = startingPoints[index];
-        startingPoints.RemoveAt(index);
-        return v;
+    private int roundRobinIndex = 0;
+    public Vector2 GetRoundRobinStartingPoint(){
+        if(roundRobinIndex > startingPoints.Count)
+            roundRobinIndex = 0;
+        return startingPoints[roundRobinIndex++];
     }
     public Vector2 GetRandomItemPosition(){
         return itemPositions[Random.Range(0,itemPositions.Count - 1)];
