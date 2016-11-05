@@ -1,5 +1,7 @@
 using UnityEngine.Networking;
+using UnityEngine.Networking.NetworkSystem;
 using UnityEngine;
+
 
 class MyNetworkManager : NetworkManager{
 
@@ -12,10 +14,14 @@ class MyNetworkManager : NetworkManager{
     public event DelegateOnStartClient delegateOnStartClient;
     public event DelegateOnStartHost delegateOnStopHost;
     public event DelegateOnStartClient delegateOnStopClient;
+    public event DelegateOnServerAddPlayer delegateOnServerAddPlayer;
+    public event DelegateOnServerRemovePlayer delegateOnServerRemovePlayer;
     public delegate void DelegateOnStartHost();
     public delegate void DelegateOnStartClient();
     public delegate void DelegateOnStopHost();
     public delegate void DelegateOnStopClient();
+    public delegate void DelegateOnServerAddPlayer(GameObject player);
+    public delegate void DelegateOnServerRemovePlayer(GameObject player);
 
     public bool isHost;
     
@@ -50,5 +56,30 @@ class MyNetworkManager : NetworkManager{
     public override void OnStopClient(){
         if(delegateOnStopClient != null)
             delegateOnStopClient();
+    }
+
+
+
+    public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+	{
+        var gameManager = GameManager.singleton;
+        var playerGameObject = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity/*, GetStartPosition()*/) as GameObject;
+		
+        //delegate
+        if(delegateOnServerAddPlayer != null)
+            delegateOnServerAddPlayer(playerGameObject);
+        //spawning        
+        NetworkServer.AddPlayerForConnection(conn, playerGameObject, playerControllerId);
+        
+        //synchronize
+        GameManager.singleton.Synchronize();
+
+	}
+
+    public override void OnServerDisconnect(NetworkConnection conn){
+        if(delegateOnServerRemovePlayer != null)
+            foreach(var player in conn.playerControllers)
+                delegateOnServerRemovePlayer(player.gameObject);
+        base.OnServerDisconnect(conn);
     }
 }

@@ -73,9 +73,6 @@ public class SceneManager : MonoBehaviour {
 	}
 	
 	void OnStartHost(){
-		Debug.Log("Host");
-		Debug.Log(Network.isServer);
-		Debug.Log(Network.isClient);
 		State = WAITING_CLIENT;
 	}
 

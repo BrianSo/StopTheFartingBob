@@ -39,7 +39,7 @@ public class FieldOfView : NetworkBehaviour {
 	}
 
 	void LateUpdate() {
-		if (isLocalPlayer) {
+		if (this.IsOwnByLocalPlayer()) {
 			DrawFieldOfView ();
 		}
 	}

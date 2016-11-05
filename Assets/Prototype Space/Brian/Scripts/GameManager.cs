@@ -9,7 +9,6 @@ using System.Collections.Generic;
 public class GameManager : NetworkBehaviour {
     public static GameManager singleton;
 
-	List<GameObject> charactors;
 	GameObject gardener;
 	GameObject bob;
 
@@ -19,8 +18,34 @@ public class GameManager : NetworkBehaviour {
 	const int PLAYING = 2;
 	const int END = 3;
 	
-	public GameObject[] players;
-	public GameObject localPlayer;
+
+	public void Synchronize(){
+		RpcSynchronize(bob, gardener);
+	}
+	[ClientRpc]
+	public void RpcSynchronize(GameObject bob, GameObject gardener){
+		this.bob = bob;
+		this.gardener = gardener;
+	}
+
+	public void OnServerAddPlayer(GameObject player){
+		//assign charactor to player
+		if(bob == null){
+			player.GetComponent<Player>().charactor = Player.BOB;
+			bob = player;
+		}else{
+			player.GetComponent<Player>().charactor = Player.GARNDERER;
+			gardener = player;
+		}
+	}
+	public void OnServerRemovePlayer(GameObject player){
+		//clean up values
+		if(bob == player){
+			bob = null;
+		}else if(gardener == player){
+			gardener = null;
+		}
+	}
 
     void Awake(){
 		//singleton pattern
@@ -29,7 +54,10 @@ public class GameManager : NetworkBehaviour {
 		else if (singleton != this)
 			Destroy(this);
 	}
+	
 	void Start(){
+		MyNetworkManager.singleton.delegateOnServerAddPlayer += OnServerAddPlayer;
+		MyNetworkManager.singleton.delegateOnServerRemovePlayer += OnServerRemovePlayer;
 		//StartCoroutine(StartGameCoroutine());
 	}
 	System.Collections.IEnumerator StartGameCoroutine() {
@@ -42,6 +70,8 @@ public class GameManager : NetworkBehaviour {
 		//singleton pattern
 		if(this == singleton)
 			singleton = null;
+		MyNetworkManager.singleton.delegateOnServerAddPlayer -= OnServerAddPlayer;
+		MyNetworkManager.singleton.delegateOnServerRemovePlayer -= OnServerRemovePlayer;
 	}
 
 	[Server]

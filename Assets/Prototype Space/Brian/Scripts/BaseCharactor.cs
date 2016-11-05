@@ -3,7 +3,7 @@ using UnityEngine.Networking;
 using System.Collections;
 
 /// The Base Class that all charactor will be inherited
-public class BaseCharactor : NetworkBehaviour {
+public class BaseCharactor : NetworkUnit {
 
 	public static BaseCharactor localCharactor;
 
@@ -17,29 +17,31 @@ public class BaseCharactor : NetworkBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		if(isLocalPlayer){
-			localCharactor = this;
-		}
 		rb = GetComponent<Rigidbody>();
 		viewCamera = Camera.main;
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
-	void Destroy(){
-		if(localCharactor == this){
-			localCharactor = null;
+
+	protected override void OnPlayerChanged(){
+		if(isOwnByLocalPlayer){
+			this.Singleton(ref localCharactor);
 		}
+	}
+
+	void Destroy(){
+		this.RemoveSingleton(ref localCharactor);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(isLocalPlayer){
+		if(isOwnByLocalPlayer){
 			mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
 			transform.LookAt (mousePos + Vector3.up * transform.position.y);
 		}
 	}
 
 	void FixedUpdate(){
-		if(isLocalPlayer){
+		if(isOwnByLocalPlayer){
 			HandleControl();	
 		}
 	}
