@@ -51,4 +51,9 @@ public class MapManager : MonoBehaviour {
 		generator.GenerateMap(width, height, seed.GetHashCode());
 		map = generator.ConstructMapObjects(out mapTiles, out units);
 	}
+	public void DestroyMap(){
+		if(map){
+			Destroy(map);
+		}
+	}
 }
