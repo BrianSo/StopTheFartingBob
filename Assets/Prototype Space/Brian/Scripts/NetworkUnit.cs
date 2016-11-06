@@ -19,4 +19,9 @@ public class NetworkUnit : NetworkBehaviour {
 	}
 
 	protected virtual void OnPlayerChanged(){}
+
+	[ClientRpc]
+	public void RpcMove(Vector3 position){
+		gameObject.transform.position = position;
+	}
 }

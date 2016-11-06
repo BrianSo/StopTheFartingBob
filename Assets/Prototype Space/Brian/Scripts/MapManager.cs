@@ -21,14 +21,20 @@ public class MapManager : MonoBehaviour {
 	public GameObject[,] mapTiles;
 
 
-	Vector3 GetStartingPosition(){
+	public Vector3 GetStartingPosition(){
 		Vector2 pt = sourceMap.GetRoundRobinStartingPoint();
-		return new Vector3(pt.x, 0, pt.y);
+		var width = sourceMap.width;
+		var height = sourceMap.height;
+		Vector3 positionFix = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		return new Vector3(pt.x, 0, pt.y) + positionFix;
 	}
 
-	Vector3 GetItemPosition(){
+	public Vector3 GetItemPosition(){
 		Vector2 pt = sourceMap.GetRandomItemPosition();
-		return new Vector3(pt.x, 0, pt.y);
+		var width = sourceMap.width;
+		var height = sourceMap.height;
+		Vector3 positionFix = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		return new Vector3(pt.x, 0, pt.y) + positionFix;
 	}
 
 	void Awake(){
@@ -52,19 +58,18 @@ public class MapManager : MonoBehaviour {
 		return Time.time.ToString();
 	}
 	public void GenerateMap(){
-		if(map){
-			Destroy(map);
-		}
-		if(units != null)
-		foreach(GameObject gameObject in units){
-			Destroy(gameObject);
-		}
-		generator.GenerateMap(width, height, seed.GetHashCode());
+		DestroyMap();
+		sourceMap = generator.GenerateMap(width, height, seed.GetHashCode());
 		map = generator.ConstructMapObjects(out mapTiles, out units);
 	}
 	public void DestroyMap(){
-		if(map){
+		generator.Release();
+		if(map != null){
 			Destroy(map);
 		}
+		if(units != null)
+			foreach(GameObject gameObject in units){
+				Destroy(gameObject);
+			}
 	}
 }

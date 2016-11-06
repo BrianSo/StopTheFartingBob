@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public abstract class MapGenerator: MonoBehaviour{
 
+	#region setting
 	public Tile[] tiles;
 
 	public const int TILE_NOTHING = 0;
@@ -15,6 +16,7 @@ public abstract class MapGenerator: MonoBehaviour{
 	public const int OBJ_NOTHING = 0;
 	public const int OBJ_BUSHES = 1;
 	public const int OBJ_PLANTS = 2;
+	#endregion
 
 	protected Map map;
 	protected System.Random random;
@@ -33,7 +35,10 @@ public abstract class MapGenerator: MonoBehaviour{
 		Styling();
 		return map;
 	}
-
+	public virtual void Release(){
+		map = null;
+		middlewares.Clear();
+	}
 	
 	// create the gameobjects according to the map generated
 	public GameObject ConstructMapObjects(out GameObject[,] mapGameObjects, out List<GameObject> unitGameObjects){

@@ -44,13 +44,16 @@ public class GameManager : NetworkBehaviour {
 
 	bool isGameStarted = false;
 
+	[Server]
 	public void Synchronize(){
-		RpcSynchronize(bobPlayer, gardenerPlayer);
+		RpcSynchronize(bobPlayer, gardenerPlayer, bob, gardener);
 	}
 	[ClientRpc]
-	public void RpcSynchronize(GameObject bob, GameObject gardener){
-		this.bobPlayer = bob;
-		this.gardenerPlayer = gardener;
+	public void RpcSynchronize(GameObject bobPlayer, GameObject gardenerPlayer, GameObject bob, GameObject gardener){
+		this.bobPlayer = bobPlayer;
+		this.gardenerPlayer = gardenerPlayer;
+		this.bob = bob;
+		this.gardener = gardener;
 	}
 
 	public void OnServerAddPlayer(GameObject player){
@@ -126,8 +129,8 @@ public class GameManager : NetworkBehaviour {
 		bob.GetComponent<NetworkUnit>().RpcSetPlayer(bobPlayer);
 		gardener.GetComponent<NetworkUnit>().RpcSetPlayer(gardenerPlayer);
 
-		State = WAITING_READY;// This line should be able to erase, but unity has bugs... 
-		RpcChangeState(WAITING_READY);// Rpc not called in Server
+		Synchronize(); 
+		RpcChangeState(WAITING_READY);
 	}
 
 	public void PlayerReady(GameObject player){
@@ -163,8 +166,8 @@ public class GameManager : NetworkBehaviour {
 		MapManager.singleton.GenerateMap();
 
 		PlaceCharactors();
-
 		State = GAME_STARTED;
+		this.GetComponent<Game>().enabled = true;
 	}
 
 	[ClientRpc]
@@ -172,9 +175,12 @@ public class GameManager : NetworkBehaviour {
 		State = state;
 	}
 
-	[Server]
 	void PlaceCharactors(){
-
+		var mm = MapManager.singleton;
+		var bobPosition = mm.GetStartingPosition();
+		var gardenerPosition = mm.GetStartingPosition();
+		bob.transform.position = bobPosition;
+		gardener.transform.position = gardenerPosition;
 	}
 
 	[Server]
@@ -186,6 +192,7 @@ public class GameManager : NetworkBehaviour {
 	}
 	void EndGameLocal(){
 		MapManager.singleton.DestroyMap();
+		this.GetComponent<Game>().enabled = false;
 	}
 
 	void OnGUI(){
