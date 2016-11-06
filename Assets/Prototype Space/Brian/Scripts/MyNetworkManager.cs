@@ -24,6 +24,7 @@ class MyNetworkManager : NetworkManager{
     public delegate void DelegateOnServerRemovePlayer(GameObject player);
 
     public bool isHost;
+    public GameObject gameManagerPrefab;
     
 
     //Awake() // don't use this
@@ -42,18 +43,25 @@ class MyNetworkManager : NetworkManager{
         return base.StartClient();
     }
     public override void OnStartHost(){
+        base.OnStartHost();
         if(delegateOnStartHost != null)
             delegateOnStartHost();
     }
+    public override void OnServerConnect(NetworkConnection conn){
+        base.OnServerConnect(conn);
+    }
     public override void OnStartClient(NetworkClient client){
+        base.OnStartClient(client);
         if(delegateOnStartClient != null)
             delegateOnStartClient();
     }
     public override void OnStopHost(){
+        base.OnStopHost();
         if(delegateOnStopHost != null)
             delegateOnStartHost();
     }
     public override void OnStopClient(){
+        base.OnStopClient();
         if(delegateOnStopClient != null)
             delegateOnStopClient();
     }
@@ -71,9 +79,13 @@ class MyNetworkManager : NetworkManager{
         //spawning        
         NetworkServer.AddPlayerForConnection(conn, playerGameObject, playerControllerId);
         
+        //spawn Game Manager
+        if(GameManager.singleton == null){
+            NetworkServer.Spawn(Instantiate(gameManagerPrefab));
+            GameManager.singleton.OnServerAddPlayer(playerGameObject);
+        }
         //synchronize
         GameManager.singleton.Synchronize();
-
 	}
 
     public override void OnServerDisconnect(NetworkConnection conn){

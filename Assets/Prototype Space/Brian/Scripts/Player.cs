@@ -16,10 +16,15 @@ public class Player : NetworkBehaviour {
 	public override void OnStartLocalPlayer(){
 		this.Singleton(ref localPlayer);
 	}
-	void Destory(){
+	void OnDestroy(){
 		if(isLocalPlayer){
 			this.RemoveSingleton(ref localPlayer);
 		}
+	}
+
+	[Command]
+	public void CmdReady(){
+		GameManager.singleton.PlayerReady(this.gameObject);
 	}
 
 	// Use this for initialization

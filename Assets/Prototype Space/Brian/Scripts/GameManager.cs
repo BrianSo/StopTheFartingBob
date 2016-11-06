@@ -9,7 +9,27 @@ using System.Collections;
 public class GameManager : NetworkBehaviour {
     public static GameManager singleton;
 
+	public static event DelegateOnStateChanged delegateOnStateChanged;
+	public delegate void DelegateOnStateChanged(int state);
+
+	public int _state = 0;
+	public int State{get{
+		return _state;
+	}private set{
+		_state = value;
+		if(delegateOnStateChanged != null){
+			delegateOnStateChanged(_state);
+		}
+			
+	}}
 	
+	public const int WAITING_CONNECTION = 0;
+	public const int WAITING_READY = 1;
+	public const int GAME_STARTED = 2;
+
+	bool bobReady;
+	bool gardenerReady;
+
 	GameObject bobPlayer;
 	GameObject gardenerPlayer;
 
@@ -43,17 +63,16 @@ public class GameManager : NetworkBehaviour {
 			gardenerPlayer = player;
 		}
 
-		StartCoroutine(CheckStartGame());
+		StartCoroutine(CheckPlayerCount());
 	}
 	public void OnServerRemovePlayer(GameObject player){
 		//clean up values
 		if(bobPlayer == player){
 			bobPlayer = null;
-			Reset();
 		}else if(gardenerPlayer == player){
 			gardenerPlayer = null;
-			Reset();
 		}
+		Reset();
 	}
 
     void Awake(){
@@ -73,18 +92,21 @@ public class GameManager : NetworkBehaviour {
 		NetworkServer.Destroy(bob);
 		NetworkServer.Destroy(gardener);
 		isGameStarted = false;
+		RpcChangeState(WAITING_CONNECTION);
 	}
 
-	void Destroy(){
+	void OnDestroy(){
+		Debug.Log("GameManager: Destroy");
 		//singleton pattern
 		if(this == singleton)
 			singleton = null;
 		MyNetworkManager.singleton.delegateOnServerAddPlayer -= OnServerAddPlayer;
 		MyNetworkManager.singleton.delegateOnServerRemovePlayer -= OnServerRemovePlayer;
+		EndGameLocal();
 	}
 	
 
-	IEnumerator CheckStartGame(){
+	IEnumerator CheckPlayerCount(){
 		if(!isServer)
 			yield break;
 		yield return new WaitForSeconds(0.5f);
@@ -93,7 +115,8 @@ public class GameManager : NetworkBehaviour {
 		}
 	}
 	
-
+	#region hint scene
+	[Server]
 	void ShowHintScene(){
 		bob = Instantiate(bobPrefab,bobHintPosition,Quaternion.identity) as GameObject;
 		NetworkServer.SpawnWithClientAuthority(bob, bobPlayer);
@@ -102,12 +125,51 @@ public class GameManager : NetworkBehaviour {
 
 		bob.GetComponent<NetworkUnit>().RpcSetPlayer(bobPlayer);
 		gardener.GetComponent<NetworkUnit>().RpcSetPlayer(gardenerPlayer);
+
+		State = WAITING_READY;// This line should be able to erase, but unity has bugs... 
+		RpcChangeState(WAITING_READY);// Rpc not called in Server
 	}
+
+	public void PlayerReady(GameObject player){
+		Debug.Log(player);
+		if(player == bobPlayer){
+			Debug.Log("BOB ready");
+			bobReady = true;
+		}else if(player == gardenerPlayer){
+			Debug.Log("gardener ready");
+			gardenerReady = true;
+		}
+		CheckStartGame();
+	}
+
+	void CheckStartGame(){
+		Debug.Log("CheckStartGame");
+		if(bobReady && gardenerReady){
+			Debug.Log("startGame");
+			StartGame();
+		}
+	}
+	#endregion
 
 	[Server]
 	public void StartGame(){
 		string seed = MapManager.singleton.getRandomSeed();
-		RpcGenerateMap(seed);
+		RpcStartGame(seed);
+	}
+
+	[ClientRpc]
+	public void RpcStartGame(string seed){
+		MapManager.singleton.seed = seed;
+		MapManager.singleton.GenerateMap();
+
+		PlaceCharactors();
+
+		State = GAME_STARTED;
+	}
+
+	[ClientRpc]
+	void RpcChangeState(int state){
+		State = state;
 	}
 
 	[Server]
@@ -115,16 +177,43 @@ public class GameManager : NetworkBehaviour {
 
 	}
 
-	[ClientRpc]
-	void RpcGenerateMap(string seed){
-		MapManager.singleton.seed = seed;
-		MapManager.singleton.GenerateMap();
-
-		PlaceCharactors();
-	}
-
 	[Server]
 	public void EndGame(){
+		RpcEndGame();
+	}
+	void RpcEndGame(){
+		EndGameLocal();
+	}
+	void EndGameLocal(){
+		MapManager.singleton.DestroyMap();
+	}
 
+	void OnGUI(){
+		GUI.TextArea(new Rect(30,10,15,20), "" + _state);
+		if(GUI.Button(new Rect(45,10,30,20), "rpc")){
+			RpcCall();
+		}
+		if(GUI.Button(new Rect(75,10,30,20), "cmd")){
+			CmdCommand();
+		}
+		if(Time.time < lastTime + 3)
+			GUI.TextArea(new Rect(30,30,40,20), message);
+	}
+
+	string message = "";
+	float lastTime = 0;
+	[ClientRpc]
+	public void RpcCall(){
+		Debug.Log("Rpc");
+		message = "Rpc";
+		lastTime = Time.time;
+	}
+
+	[Command]
+	public void CmdCommand(){
+		Debug.Log("Command");
+		message = "Cmd";
+		RpcCall();
+		lastTime = Time.time;
 	}
 }

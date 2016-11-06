@@ -32,7 +32,12 @@ public class SceneManager : MonoBehaviour {
 		this.State = MAIN_MENU;
 	}
 
+	void OnGUI(){
+		GUI.TextArea(new Rect(10, 10, 15, 20), "" + _state);
+	}
+
 	void OnStateChange(int state){
+		Debug.Log("Scene: OnStateChange:" + state);
 		mainMenuUI.SetActive(false);
 		connectingToHostUI.SetActive(false);
 		WaitingClientUI.SetActive(false);
@@ -63,6 +68,7 @@ public class SceneManager : MonoBehaviour {
 		nm.delegateOnStartClient += OnStartClient;
 		nm.delegateOnStopHost += OnDisconnected;
 		nm.delegateOnStopClient += OnDisconnected;
+		GameManager.delegateOnStateChanged += OnGameStateChanged;
 	}
 	void RemoveDelegate(){
 		MyNetworkManager nm = MyNetworkManager.singleton;
@@ -70,6 +76,28 @@ public class SceneManager : MonoBehaviour {
 		nm.delegateOnStartClient -= OnStartClient;
 		nm.delegateOnStopHost -= OnDisconnected;
 		nm.delegateOnStopClient -= OnDisconnected;
+		GameManager.delegateOnStateChanged -= OnGameStateChanged;
+	}
+
+	void OnGameStateChanged(int state){
+		Debug.Log("OnGameStateChanged:" + state);
+		switch(state){
+			case GameManager.WAITING_CONNECTION:
+				if(!MyNetworkManager.singleton.isNetworkActive){
+					State = MAIN_MENU;
+				}else if(MyNetworkManager.singleton.isHost){
+					State = WAITING_CLIENT;
+				}else{
+					State = CONNECTING_TO_HOST;
+				}
+			break;
+			case GameManager.WAITING_READY:
+				State = SELECTION_SCENE;
+			break;
+			case GameManager.GAME_STARTED:
+				State = GAME_SCENE;
+			break;
+		}
 	}
 	
 	void OnStartHost(){
@@ -101,7 +129,7 @@ public class SceneManager : MonoBehaviour {
 			Destroy(this);
 		}
 	}
-	void Destroy(){
+	void OnDestroy(){
 		// reslove singleton
 		if(singleton == this)
 			singleton = null;
