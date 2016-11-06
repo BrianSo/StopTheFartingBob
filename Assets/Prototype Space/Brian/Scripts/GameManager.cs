@@ -3,6 +3,9 @@ using UnityEngine.Networking;
 using System.Collections;
 
 /// GameManager responsible to each game
+/// Actually it gave it a wrong name
+/// It should be LobbyManager instead
+/// It counts the player connection and assign charactor to the players
 /// It will be Destroyed after the game end
 /// 
 /// To find the manager for the whole game software, use SceneManager instead

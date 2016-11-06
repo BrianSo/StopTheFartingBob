@@ -4,6 +4,7 @@ using System.Collections;
 
 public class NetworkUnit : NetworkBehaviour {
 
+	[HideInInspector]
 	public Player player;
 	public bool isOwnByLocalPlayer{
 		get{

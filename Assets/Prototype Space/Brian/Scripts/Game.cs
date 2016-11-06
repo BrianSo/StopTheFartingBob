@@ -14,6 +14,11 @@ public class Game : NetworkBehaviour {
 
 	public static Game singleton;
 
+	public float itemGenerationInterval = 1f;
+	private float randomItemTimer;
+
+	public bool isGameStarted{get{return this.enabled;}}
+
 	[SyncVar(hook="OnPollutionIndexChanged")]
 	public int pollutionIndex;
 
@@ -28,6 +33,7 @@ public class Game : NetworkBehaviour {
 	void StartGame(){
 		//initialization
 		pollutionIndex = 0;
+		randomItemTimer = itemGenerationInterval;
 	}
 
 	void EndGame(){
@@ -37,7 +43,22 @@ public class Game : NetworkBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-	
+		if(isServer){
+			HandleItemGeneration();	
+		}
+	}
+
+	[Server]
+	void HandleItemGeneration(){
+		randomItemTimer -= Time.deltaTime;
+		if(randomItemTimer <= 0){
+			randomItemTimer = itemGenerationInterval;
+
+			// place new item
+			var prefab = ItemsPool.GetRandomItemPrefab();
+			var obj = Instantiate(prefab, MapManager.singleton.GetItemPosition(), Quaternion.identity) as GameObject;
+			NetworkServer.Spawn(obj);
+		}
 	}
 
 	void OnPollutionIndexChanged(int val){
