@@ -24,11 +24,9 @@ public abstract class MapGenerator: MonoBehaviour{
 	protected System.Random random;
 
 	public bool drawGizmo = false;
-
-	List<GameObject> mapObjects;
+	
 	void Start(){
 		middlewares = new List<MapGenerationMiddleware>();
-		mapObjects = new List<GameObject>();
 	}
 	// create and generate a new map in data structure, by the MapGenerationMiddleware used.
 	// setup the middleware in Styling();
@@ -42,23 +40,26 @@ public abstract class MapGenerator: MonoBehaviour{
 
 	
 	// create the gameobjects according to the map generated
-	public void ConstructMapObjects(){
-		foreach(GameObject obj in mapObjects){
-			Destroy(obj);
-		}
-		mapObjects.Clear();
+	public GameObject ConstructMapObjects(out GameObject[,] mapGameObjects){
 		int width = map.GetLength(0);
 		int height = map.GetLength(1);
+
+		mapGameObjects = new GameObject[width,height];
+		GameObject mapGameObject = new GameObject("Map");
+
 		for (int x = 0; x < width; x ++) {
 			for (int y = 0; y < height; y ++) {
 				if(map[x,y].tileNumber == TILE_NOTHING){
 					continue;
 				}
 				GameObject generated = tiles[map[x,y].tileNumber - 1].GetVariation(random);
-				generated.transform.position = new Vector3(-width/2 + x + .5f, -height/2 + y+.5f,0);
-				mapObjects.Add(generated);
+				generated.transform.position = new Vector3(x, 0, y);
+				mapGameObjects[x,y] = generated;
+				generated.transform.parent = mapGameObject.transform;
 			}
 		}
+		mapGameObject.transform.position = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		return mapGameObject;
 	}
 
 	public abstract void Styling();
@@ -106,7 +107,7 @@ public abstract class MapGenerator: MonoBehaviour{
 							break;
 					}
 
-                    Vector3 pos = new Vector3(-width/2 + x + .5f, -height/2 + y+.5f,0);
+                    Vector3 pos = new Vector3(-width/2 + x + .5f, 0,-height/2 + y+.5f);
                     Gizmos.DrawCube(pos,Vector3.one);
 
 					// draw objects
