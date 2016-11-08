@@ -4,9 +4,12 @@ using System.Collections;
 
 public class Item : NetworkBehaviour {
 
+
+	public ItemUser owner;
+
 	// Use this for initialization
 	void Start () {
-
+		
 	}
 	
 	// Update is called once per frame

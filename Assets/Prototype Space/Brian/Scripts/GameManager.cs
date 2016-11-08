@@ -33,11 +33,11 @@ public class GameManager : NetworkBehaviour {
 	bool bobReady;
 	bool gardenerReady;
 
-	GameObject bobPlayer;
-	GameObject gardenerPlayer;
+	public GameObject bobPlayer;
+	public GameObject gardenerPlayer;
 
-	GameObject bob;
-	GameObject gardener;
+	public GameObject bob;
+	public GameObject gardener;
 
 	public GameObject bobPrefab;
 	public GameObject gardenerPrefab;

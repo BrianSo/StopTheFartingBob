@@ -25,4 +25,18 @@ public static class Util{
             singletion = null;
         }
     }
+
+    private static Vector3 mousePos;
+    private static float lastUpdateTime;
+    public static Vector3 MousePositionInWorld{
+        get{
+            if(lastUpdateTime == Time.time){
+                return mousePos;
+            }
+            lastUpdateTime = Time.time;
+            var viewCamera = Camera.main;
+            mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
+            return mousePos;
+        }
+    }
 }

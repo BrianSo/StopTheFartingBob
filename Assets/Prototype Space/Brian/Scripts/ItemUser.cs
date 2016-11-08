@@ -73,7 +73,8 @@ public class ItemUser : NetworkBehaviour {
 	[ClientRpc]
 	void RpcPickUpItem(GameObject itemObj){
 		Item item = itemObj.GetComponent<Item>();
-		itemCarried = item;
+		this.itemCarried = item;
+		item.owner = this;
 		if(this.IsOwnByLocalPlayer()){
 			//do UI stuff
 

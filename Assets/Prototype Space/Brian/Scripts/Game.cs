@@ -17,26 +17,34 @@ public class Game : NetworkBehaviour {
 	public float itemGenerationInterval = 1f;
 	private float randomItemTimer;
 
-	public bool isGameStarted{get{return this.enabled;}}
+	public bool isGameStarted = false;
 
 	[SyncVar(hook="OnPollutionIndexChanged")]
-	public int pollutionIndex;
+	public float pollutionIndex;
+
+	void Awake(){
+		this.Singleton(ref singleton);
+	}
+	void Destroy(){
+		this.RemoveSingleton(ref singleton);
+	}
 
 	void OnEnable () {
-		this.Singleton(ref singleton);
 		StartGame();
 	}
 	void OnDisable(){
-		this.RemoveSingleton(ref singleton);
+		isGameStarted = false;
 	}
 
 	void StartGame(){
 		//initialization
 		pollutionIndex = 0;
 		randomItemTimer = itemGenerationInterval;
+		isGameStarted = true;
 	}
 
 	void EndGame(){
+		isGameStarted = false;
 		if(delegateOnGameEnd != null)
 			delegateOnGameEnd();
 	}
@@ -61,13 +69,48 @@ public class Game : NetworkBehaviour {
 		}
 	}
 
-	void OnPollutionIndexChanged(int val){
-		if(val > 100){
-			StartCoroutine(BobWin());
+	void OnPollutionIndexChanged(float val){
+		Debug.Log("pollution index: " + val);
+		//maybe change game ui
+	}
+
+	[Server]
+	public void IncreasePollutionIndex(float amount){
+		if(!isGameStarted)
+			return;
+		pollutionIndex += amount;
+		if(isGameStarted && pollutionIndex >= 100){
+			StopGame();
+			RpcBobWin();
 		}
 	}
 
+	[Server]
+	public void BobGotZeroHealth(){
+		if(!isGameStarted)
+			return;
+		StopGame();
+		RpcGardenerWin();
+	}
+
+	void StopGame(){
+		isGameStarted = false;
+	}
+
+	[ClientRpc]
+	void RpcBobWin(){
+		StopGame();
+		StartCoroutine(BobWin());
+	}
+	[ClientRpc]
+	void RpcGardenerWin(){
+		StopGame();
+		StartCoroutine(GardenerWin());
+	}
+
+	[Client]
 	IEnumerator BobWin(){
+		Debug.Log("Bob win");
 		//Play win animation
 		yield return new WaitForSeconds(3f);
 		//when animation ended
@@ -76,7 +119,9 @@ public class Game : NetworkBehaviour {
 		yield return null;
 	}
 
+	[Client]
 	IEnumerator GardenerWin(){
+		Debug.Log("Gardener win");
 		//Play win animation
 		yield return new WaitForSeconds(3f);
 		//when animation ended
