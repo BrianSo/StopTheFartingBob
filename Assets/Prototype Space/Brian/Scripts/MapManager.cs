@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class MapManager : MonoBehaviour {
 
@@ -12,11 +12,30 @@ public class MapManager : MonoBehaviour {
 
 	public MapGenerator generator;
 
-	public string seed;
-    public bool useRandomSeed;
+    public string seed;
+
+	public Map sourceMap;
 
 	public GameObject map;
+	public List<GameObject> units;
 	public GameObject[,] mapTiles;
+
+
+	public Vector3 GetStartingPosition(){
+		Vector2 pt = sourceMap.GetRoundRobinStartingPoint();
+		var width = sourceMap.width;
+		var height = sourceMap.height;
+		Vector3 positionFix = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		return new Vector3(pt.x, 0, pt.y) + positionFix;
+	}
+
+	public Vector3 GetItemPosition(){
+		Vector2 pt = sourceMap.GetRandomItemPosition();
+		var width = sourceMap.width;
+		var height = sourceMap.height;
+		Vector3 positionFix = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		return new Vector3(pt.x, 0, pt.y) + positionFix;
+	}
 
 	void Awake(){
 		//singleton pattern
@@ -33,18 +52,24 @@ public class MapManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		GenerateMap();
+		
 	}
-	
+	public string getRandomSeed(){
+		return Time.time.ToString();
+	}
 	public void GenerateMap(){
-		if (useRandomSeed) {
-            seed = Time.time.ToString();
-        }
-
-		if(map){
+		DestroyMap();
+		sourceMap = generator.GenerateMap(width, height, seed.GetHashCode());
+		map = generator.ConstructMapObjects(out mapTiles, out units);
+	}
+	public void DestroyMap(){
+		generator.Release();
+		if(map != null){
 			Destroy(map);
 		}
-		generator.GenerateMap(width, height, seed.GetHashCode());
-		map = generator.ConstructMapObjects(out mapTiles);
+		if(units != null)
+			foreach(GameObject gameObject in units){
+				Destroy(gameObject);
+			}
 	}
 }

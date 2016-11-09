@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public abstract class MapGenerator: MonoBehaviour{
 
+	#region setting
 	public Tile[] tiles;
 
 	public const int TILE_NOTHING = 0;
@@ -15,12 +16,9 @@ public abstract class MapGenerator: MonoBehaviour{
 	public const int OBJ_NOTHING = 0;
 	public const int OBJ_BUSHES = 1;
 	public const int OBJ_PLANTS = 2;
+	#endregion
 
-	public struct Block{
-		public int tileNumber;
-		public int objNumber;
-	}
-	protected Block[,] map;
+	protected Map map;
 	protected System.Random random;
 
 	public bool drawGizmo = false;
@@ -30,35 +28,50 @@ public abstract class MapGenerator: MonoBehaviour{
 	}
 	// create and generate a new map in data structure, by the MapGenerationMiddleware used.
 	// setup the middleware in Styling();
-	public Block[,] GenerateMap(int width, int height, int seed){
+	public Map GenerateMap(int width, int height, int seed){
 		random = new System.Random(seed);
-		map = new Block[width,height];
+		map = new Map(width,height);
 		middlewares.Clear();
 		Styling();
 		return map;
 	}
-
+	public virtual void Release(){
+		map = null;
+		middlewares.Clear();
+	}
 	
 	// create the gameobjects according to the map generated
-	public GameObject ConstructMapObjects(out GameObject[,] mapGameObjects){
-		int width = map.GetLength(0);
-		int height = map.GetLength(1);
+	public GameObject ConstructMapObjects(out GameObject[,] mapGameObjects, out List<GameObject> unitGameObjects){
+		int width = map.width;
+		int height = map.height;
 
 		mapGameObjects = new GameObject[width,height];
 		GameObject mapGameObject = new GameObject("Map");
+		unitGameObjects = new List<GameObject>();
 
 		for (int x = 0; x < width; x ++) {
 			for (int y = 0; y < height; y ++) {
-				if(map[x,y].tileNumber == TILE_NOTHING){
+				if(map.blocks[x,y].tileNumber == TILE_NOTHING){
 					continue;
 				}
-				GameObject generated = tiles[map[x,y].tileNumber - 1].GetVariation(random);
+				GameObject generated = tiles[map.blocks[x,y].tileNumber - 1].GetVariation(random);
 				generated.transform.position = new Vector3(x, 0, y);
 				mapGameObjects[x,y] = generated;
 				generated.transform.parent = mapGameObject.transform;
 			}
 		}
-		mapGameObject.transform.position = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		Vector3 positionFix = new Vector3(-width/2 + .5f,0,-height/2 + .5f);
+		for (int x = 0; x < width; x ++) {
+			for (int y = 0; y < height; y ++) {
+				if(map.blocks[x,y].objNumber == OBJ_NOTHING){
+					continue;
+				}
+				GameObject generated = Instantiate(gameObjects[map.blocks[x,y].objNumber - 1]);
+				generated.transform.position = new Vector3(x, 0, y) + positionFix;
+				unitGameObjects.Add(generated);
+			}
+		}
+		mapGameObject.transform.position = positionFix;
 		return mapGameObject;
 	}
 
@@ -72,13 +85,9 @@ public abstract class MapGenerator: MonoBehaviour{
 	}
 
 	public abstract class MapGenerationMiddleware{
-		protected Block[,] map;
-		protected int width;
-		protected int height;
+		protected Map map;
 		protected System.Random random;
-		public void Process(Block[,] map,System.Random random){
-			width = map.GetLength(0);
-			height = map.GetLength(1);
+		public void Process(Map map,System.Random random){
 			this.map = map; this.random = random; Process();
 		}
 		protected abstract void Process();
@@ -87,12 +96,12 @@ public abstract class MapGenerator: MonoBehaviour{
 
 	void OnDrawGizmos() {
 		if(drawGizmo && map != null){
-			int width = map.GetLength(0);
-			int height = map.GetLength(1);
+			int width = map.width;
+			int height = map.height;
 			for (int x = 0; x < width; x ++) {
                 for (int y = 0; y < height; y ++) {
 					// draw tiles
-					switch(map[x,y].tileNumber){
+					switch(map.blocks[x,y].tileNumber){
 						case TILE_GLASS:
 							Gizmos.color = Color.gray;
 							break;
@@ -111,7 +120,7 @@ public abstract class MapGenerator: MonoBehaviour{
                     Gizmos.DrawCube(pos,Vector3.one);
 
 					// draw objects
-					switch(map[x,y].objNumber){
+					switch(map.blocks[x,y].objNumber){
 						case OBJ_BUSHES:
 							Gizmos.color = Color.cyan;
 							break;
@@ -123,7 +132,7 @@ public abstract class MapGenerator: MonoBehaviour{
 							break;
 					}
 
-					if(map[x,y].objNumber != OBJ_NOTHING){
+					if(map.blocks[x,y].objNumber != OBJ_NOTHING){
 						pos.z = -0.5f;
                     	Gizmos.DrawCube(pos,Vector3.one);
 					}

@@ -9,5 +9,8 @@ public class MapManagerEditor: Editor{
         if(GUILayout.Button("Generate Map")){
             manager.GenerateMap();
         }
+        if(GUILayout.Button("Destroy Map")){
+            manager.DestroyMap();
+        }
     }
 }

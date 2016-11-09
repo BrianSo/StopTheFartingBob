@@ -3,7 +3,9 @@ using UnityEngine.Networking;
 using System.Collections;
 
 /// The Base Class that all charactor will be inherited
-public class BaseCharactor : NetworkBehaviour {
+public class BaseCharactor : NetworkUnit {
+
+	public static BaseCharactor localCharactor;
 
 	public float movementSpeed = 5f;
 
@@ -19,17 +21,27 @@ public class BaseCharactor : NetworkBehaviour {
 		viewCamera = Camera.main;
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
+
+	protected override void OnPlayerChanged(){
+		if(isOwnByLocalPlayer){
+			this.Singleton(ref localCharactor);
+		}
+	}
+
+	void Destroy(){
+		this.RemoveSingleton(ref localCharactor);
+	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(isLocalPlayer){
+		if(isOwnByLocalPlayer){
 			mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
 			transform.LookAt (mousePos + Vector3.up * transform.position.y);
 		}
 	}
 
 	void FixedUpdate(){
-		if(isLocalPlayer){
+		if(isOwnByLocalPlayer){
 			HandleControl();	
 		}
 	}
