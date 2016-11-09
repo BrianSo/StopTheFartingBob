@@ -71,8 +71,60 @@ public abstract class MapGenerator: MonoBehaviour{
 				unitGameObjects.Add(generated);
 			}
 		}
+		ConstructBushesColliders(positionFix);
+
+		
 		mapGameObject.transform.position = positionFix;
 		return mapGameObject;
+	}
+
+	void ConstructBushesColliders(Vector3 positionFix){
+		int width = map.width;
+		int height = map.height;
+
+		bool[,] visited = new bool[width, height];
+		for (int x = 0; x < width; x++)
+			for(int y = 0; y < height; y++)
+				visited[x,y] = (map.blocks[x,y].objNumber != OBJ_BUSHES);
+		
+		for (int x = 0; x < width; x++){
+			for(int y = 0; y < height; y++){
+				if(visited[x,y])
+					continue;
+				ConstructBushesCollider(x, y, visited, positionFix);
+			}
+		}
+	}
+	GameObject ConstructBushesCollider(int x, int y, bool[,] visited,Vector3 positionFix){
+		int width = visited.GetLength(0);
+		int height = visited.GetLength(1);
+
+		int startX, endX;
+		int startY, endY;
+		startX = endX = x;
+		startY = endY = y;
+		while(++x < width && !visited[x,startY])
+			endX = x;
+		while(++y < height && !visited[startX,y])
+			endY = y;
+
+		for(x = startX; x <= endX; x++){
+			for(y = startY; y <= endY; y++){
+				visited[x,y] = true;
+			}
+		}
+
+		var gameObject = new GameObject();
+		gameObject.layer = LayerMask.NameToLayer("Obstacles");
+		BoxCollider collider = gameObject.AddComponent<BoxCollider>();
+		var size = new Vector3();
+		size.x = endX - startX + 1;
+		size.y = 1;
+		size.z = endY - startY + 1;
+		collider.size = size;
+		collider.isTrigger = true;
+		gameObject.transform.position = new Vector3((endX + startX)/2f, 0, (endY + startY)/2f) + positionFix;
+		return gameObject;
 	}
 
 	public abstract void Styling();
