@@ -7,6 +7,7 @@ public class BaseCharactor : NetworkUnit {
 
 	public static BaseCharactor localCharactor;
 
+	public Animator anim;
 	public float movementSpeed = 5f;
 
 
@@ -54,5 +55,12 @@ public class BaseCharactor : NetworkUnit {
 		viewCamera.transform.position = new Vector3(viewCamera.transform.position.x, 10, viewCamera.transform.position.z);
 
 		rb.velocity = new Vector3(x,0,y) * movementSpeed;
+
+		// For Sprite Animator
+		bool isWalking = (Mathf.Abs (x) + Mathf.Abs (y)) > 0;
+		Vector3 lookDirection = (mousePos - transform.position).normalized;
+		anim.SetBool ("isWalking", isWalking);
+		anim.SetFloat ("x", lookDirection.x);
+		anim.SetFloat ("y", lookDirection.z);
 	}
 }
