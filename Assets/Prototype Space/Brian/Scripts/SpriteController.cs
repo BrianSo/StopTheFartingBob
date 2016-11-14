@@ -14,7 +14,7 @@ public class SpriteController : MonoBehaviour {
 	void Update () {
 		transform.rotation = Quaternion.Euler(
 			90,
-			-baseCharacter.transform.rotation.y,
-			baseCharacter.transform.rotation.z);
+			-baseCharacter.transform.rotation.eulerAngles.z,
+			0);
 	}
 }
