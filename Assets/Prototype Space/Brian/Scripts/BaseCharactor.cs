@@ -51,8 +51,11 @@ public class BaseCharactor : NetworkUnit {
 		var x = Input.GetAxisRaw("Horizontal");
 		var y = Input.GetAxisRaw("Vertical");
 
-		viewCamera.transform.position = 0.3f*mousePos + 0.7f*transform.position;
-		viewCamera.transform.position = new Vector3(viewCamera.transform.position.x, 10, viewCamera.transform.position.z);
+
+		// Moving Camera by pixel
+		Vector3 newPos = 0.3f*mousePos + 0.7f*transform.position;
+		Vector3 roundPos = new Vector3(RoundToNearestPixel(newPos.x, viewCamera), 10, RoundToNearestPixel(newPos.z, viewCamera));
+		viewCamera.transform.position = roundPos;
 
 		rb.velocity = new Vector3(x,0,y) * movementSpeed;
 
@@ -62,5 +65,14 @@ public class BaseCharactor : NetworkUnit {
 		anim.SetBool ("isWalking", isWalking);
 		anim.SetFloat ("x", lookDirection.x);
 		anim.SetFloat ("y", lookDirection.z);
+	}
+
+	// For Pixel Perfect Camera Movement
+	public static float RoundToNearestPixel(float unityUnits, Camera viewingCamera)
+	{
+		float valueInPixels = (Screen.height / (viewingCamera.orthographicSize * 2)) * unityUnits;
+		valueInPixels = Mathf.Round(valueInPixels);
+		float adjustedUnityUnits = valueInPixels / (Screen.height / (viewingCamera.orthographicSize * 2));
+		return adjustedUnityUnits;
 	}
 }
