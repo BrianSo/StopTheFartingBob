@@ -49,7 +49,7 @@ public class ItemUser : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcDestoryItemAfterUse(){
-		Destroy(itemCarried.gameObject);
+		Destroy(itemCarried.gameObject, 2f);//delay destroy
 		itemCarried = null;
 	}
 
