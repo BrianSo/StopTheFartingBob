@@ -11,7 +11,12 @@ public class Bob : NetworkBehaviour {
 
 	public float pollutingSpeed = 1f;
 
-	CoolDown fartCooldown = new CoolDown(1f);
+	public GameObject fartPrefab;
+
+	public AudioClip[] fartingSounds;
+	AudioSource audioSource;
+
+	CoolDown fartCooldown = new CoolDown(0.5f);
 
 	// Use this for initialization
 	void Start () {
@@ -23,15 +28,41 @@ public class Bob : NetworkBehaviour {
 		fartCooldown.timer -= Time.deltaTime * pollutingSpeed;
 		if(fartCooldown.IsReady()){
 			fartCooldown.Reset();
-			//TODO place fart visual effect and bob farting animation
-
-			if(isServer){
-				//TODO Spawn the fart using NetworkServer.Spawn()
-				Game.singleton.IncreasePollutionIndex(1f);
-			}
+			Fart();
 		}else{
 			
 		}
+	}
+
+	public void Fart(){
+		//TODO place fart visual effect and bob farting animation
+
+		audioSource.clip = fartingSounds[Random.Range(0,fartingSounds.Length - 1)];
+		audioSource.Play();
+		ServerFart();
+	}
+
+	[ServerCallback]
+	void ServerFart(){
+		Game.singleton.IncreasePollutionIndex(0.5f);
+
+		var rot = transform.rotation.eulerAngles.y;
+		Vector3 offset = Vector3.zero;
+		if(rot < 45){
+			offset.z = -1f;
+		}else if(rot < 90 + 45){
+			offset.x = -1f;
+		}else if(rot < 180 + 45){
+			offset.z = 1f;
+		}else if(rot < 270 + 45){
+			offset.x = 1f;
+		}else{
+			offset.z = -1f;
+		}
+		var fartObj = Instantiate(fartPrefab, transform.position, Quaternion.identity) as GameObject;
+		var fart = fartObj.GetComponent<Fart>();
+		fart.rb.AddForce(offset, ForceMode.Impulse);
+		NetworkServer.Spawn(fartObj);
 	}
 
 
@@ -68,6 +99,7 @@ public class Bob : NetworkBehaviour {
 		}
 	}
 	void Awake(){
+		audioSource = GetComponent<AudioSource>();
 		GetComponent<NetworkUnit>().EventOnPlayerChanged +=OnPlayerChanged;
 	}
 	void Destroy(){

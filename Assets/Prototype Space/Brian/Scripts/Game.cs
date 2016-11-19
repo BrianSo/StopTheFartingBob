@@ -75,7 +75,6 @@ public class Game : NetworkBehaviour {
 
 	void OnPollutionIndexChanged(float val){
 		pollutionIndex = val;
-		Debug.Log("pollution index: " + val + " & " + pollutionIndex);
 		//maybe change game ui
 	}
 
