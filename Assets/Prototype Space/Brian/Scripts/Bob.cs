@@ -4,6 +4,8 @@ using System.Collections;
 
 public class Bob : NetworkBehaviour {
 
+	public HealthUIControl uiControl;
+
 	[SyncVar(hook="OnHealthChange")]
 	public int healthPoint;
 
@@ -35,8 +37,10 @@ public class Bob : NetworkBehaviour {
 
 
 	void OnHealthChange(int hp){
+		healthPoint = hp;
 		Debug.Log("My hp changed to " + hp);
 		//TODO update UI
+		uiControl.SetHealth(hp);
 	}
 
 	[Server]
@@ -55,5 +59,18 @@ public class Bob : NetworkBehaviour {
 	public void RpcGetHurted(int damage){
 		Debug.Log("Oh~ I am attacked");
 
+	}
+
+
+	void OnPlayerChanged(){
+		if(this.IsOwnByLocalPlayer()){
+			uiControl.ShowHealthImages();
+		}
+	}
+	void Awake(){
+		GetComponent<NetworkUnit>().EventOnPlayerChanged +=OnPlayerChanged;
+	}
+	void Destroy(){
+		GetComponent<NetworkUnit>().EventOnPlayerChanged -=OnPlayerChanged;
 	}
 }

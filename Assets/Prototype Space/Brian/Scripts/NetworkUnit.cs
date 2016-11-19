@@ -4,6 +4,9 @@ using System.Collections;
 
 public class NetworkUnit : NetworkBehaviour {
 
+	public event Callback EventOnPlayerChanged;
+	public delegate void Callback();
+
 	[HideInInspector]
 	public Player player;
 	public bool isOwnByLocalPlayer{
@@ -16,10 +19,8 @@ public class NetworkUnit : NetworkBehaviour {
 	public void RpcSetPlayer(GameObject p){
 		
 		player = p.GetComponent<Player>();
-		OnPlayerChanged();
+		EventOnPlayerChanged();
 	}
-
-	protected virtual void OnPlayerChanged(){}
 
 	[ClientRpc]
 	public void RpcMove(Vector3 position){

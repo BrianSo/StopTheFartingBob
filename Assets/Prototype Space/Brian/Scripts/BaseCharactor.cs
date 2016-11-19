@@ -23,13 +23,14 @@ public class BaseCharactor : NetworkUnit {
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
 
-	protected override void OnPlayerChanged(){
+	void OnPlayerChanged(){
 		if(isOwnByLocalPlayer){
 			this.Singleton(ref localCharactor);
 		}
 	}
 
 	void Destroy(){
+		EventOnPlayerChanged -= OnPlayerChanged;
 		this.RemoveSingleton(ref localCharactor);
 	}
 	
@@ -74,5 +75,9 @@ public class BaseCharactor : NetworkUnit {
 		valueInPixels = Mathf.Round(valueInPixels);
 		float adjustedUnityUnits = valueInPixels / (Screen.height / (viewingCamera.orthographicSize * 2));
 		return adjustedUnityUnits;
+	}
+
+	void Awake(){
+		EventOnPlayerChanged += OnPlayerChanged;
 	}
 }
