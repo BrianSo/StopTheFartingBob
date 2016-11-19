@@ -31,9 +31,11 @@ public class Game : NetworkBehaviour {
 
 	void OnEnable () {
 		StartGame();
+		Camera.main.GetComponent<AtomsphereControl>().enabled = true;
 	}
 	void OnDisable(){
 		isGameStarted = false;
+		Camera.main.GetComponent<AtomsphereControl>().enabled = false;
 	}
 
 	void StartGame(){
@@ -70,7 +72,8 @@ public class Game : NetworkBehaviour {
 	}
 
 	void OnPollutionIndexChanged(float val){
-		Debug.Log("pollution index: " + val);
+		pollutionIndex = val;
+		Debug.Log("pollution index: " + val + " & " + pollutionIndex);
 		//maybe change game ui
 	}
 

@@ -48,6 +48,7 @@ public abstract class ThrowingItem : NetworkBehaviour {
 
 		//Move to destination
 		var force = (destination - transform.position);
+		rb.velocity = Vector3.zero;
 		rb.AddForce(force,ForceMode.Impulse);
 		yield return new WaitForFixedUpdate();
 		while(rb.velocity.magnitude > 0.4f){
@@ -59,7 +60,9 @@ public abstract class ThrowingItem : NetworkBehaviour {
 	IEnumerator EndThrow(){
 		isThrowing = false;
 
-		OnItemArrived();
+		if(isServer){
+			RpcItemArrived(transform.position);
+		}
 
 		//Stop rotation
 		float rotation = rb.rotation.eulerAngles.y;
@@ -81,9 +84,19 @@ public abstract class ThrowingItem : NetworkBehaviour {
 		rb.angularVelocity = Vector3.zero;
 		rb.rotation = Quaternion.identity;
 	}
-	
+
+	[ClientRpc]
+	private void RpcItemArrived(Vector3 position){
+		transform.position = position;
+		rb.velocity = Vector3.zero;
+		OnItemArrived();
+	}
 
 	public abstract void OnItemArrived();
+
+	public void Setup(Vector3 destination, GameObject thrower){
+		RpcSetup(destination, thrower);
+	}
 
 	[ClientRpc]
 	public void RpcSetup(Vector3 destination, GameObject thrower){

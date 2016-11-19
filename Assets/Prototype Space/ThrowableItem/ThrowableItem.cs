@@ -29,6 +29,6 @@ public class ThrowableItem : Item {
 		GameObject throwingItemObj = Instantiate(throwingItemPrefab, owner.gameObject.transform.position, Quaternion.identity) as GameObject;
 		ThrowingItem throwingItem = throwingItemObj.GetComponent<ThrowingItem>();
 		NetworkServer.Spawn(throwingItemObj);
-		throwingItem.RpcSetup(destintation, this.gameObject);
+		throwingItem.Setup(destintation, this.gameObject);
 	}
 }
