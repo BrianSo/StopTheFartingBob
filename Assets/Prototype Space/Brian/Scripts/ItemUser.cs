@@ -20,12 +20,6 @@ public class ItemUser : NetworkBehaviour {
 		return unit.player == Player.localPlayer;
 	}
 
-	void OnGUI(){
-		if(itemCarried && IsOwnByLocalPlayer()){
-			GUI.TextArea(new Rect(10,50,50,20), "Item");
-		}
-	}
-
 	// Update is called once per frame
 	void Update () {
 		if(IsOwnByLocalPlayer()){
@@ -51,6 +45,10 @@ public class ItemUser : NetworkBehaviour {
 	void RpcDestoryItemAfterUse(){
 		Destroy(itemCarried.gameObject, 2f);//delay destroy
 		itemCarried = null;
+		if(this.IsOwnByLocalPlayer()){
+			//do UI stuff
+			InGameUIControl.singleton.RemoveItem();
+		}
 	}
 
 	[Server]
@@ -77,7 +75,7 @@ public class ItemUser : NetworkBehaviour {
 		item.owner = this;
 		if(this.IsOwnByLocalPlayer()){
 			//do UI stuff
-
+			InGameUIControl.singleton.PickUpItem(itemObj.GetComponentInChildren<SpriteRenderer>().sprite);
 		}
 		Debug.Log("Going to Destroy item");
 		item.gameObject.SetActive(false);

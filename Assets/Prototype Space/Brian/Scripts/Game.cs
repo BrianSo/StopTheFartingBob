@@ -36,6 +36,7 @@ public class Game : NetworkBehaviour {
 	void OnDisable(){
 		isGameStarted = false;
 		Camera.main.GetComponent<AtomsphereControl>().enabled = false;
+		InGameUIControl.singleton.HideUI();
 	}
 
 	void StartGame(){
@@ -43,6 +44,7 @@ public class Game : NetworkBehaviour {
 		pollutionIndex = 0;
 		randomItemTimer = itemGenerationInterval;
 		isGameStarted = true;
+		InGameUIControl.singleton.ShowUI();
 	}
 
 	void EndGame(){
