@@ -6,6 +6,8 @@ public class Map{
     public struct Block{
 		public int tileNumber;
 		public int objNumber;
+        public bool tilePlaced;
+        public bool objPlaced;
 	}
 
     public Block[,] blocks;

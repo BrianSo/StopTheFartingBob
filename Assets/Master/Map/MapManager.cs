@@ -10,6 +10,9 @@ public class MapManager : MonoBehaviour {
 	public int width = 20;
     public int height = 20;
 
+	public bool randomSize = true;
+	public int randomSizeVolume = 625;
+
 	public MapGenerator generator;
 
     public string seed;
@@ -52,13 +55,27 @@ public class MapManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		StartCoroutine(Test());
+	}
+	System.Collections.IEnumerator Test(){
+		yield return new WaitForSeconds(0.1f);
+		seed = System.DateTime.Now.ToString();
+		GenerateMap();
 	}
 	public string getRandomSeed(){
 		return Time.time.ToString();
 	}
 	public void GenerateMap(){
 		DestroyMap();
+		if(randomSize){
+			System.Random rand = new System.Random(seed.GetHashCode());
+
+			float approxWidth = Mathf.Sqrt(randomSizeVolume);
+			float minWidth = 12;
+			float maxWidth = approxWidth * 2 - minWidth;
+			width = rand.NextIntGaussianRange((int)minWidth, (int)maxWidth);
+			height = randomSizeVolume / width;
+		}
 		sourceMap = generator.GenerateMap(width, height, seed.GetHashCode());
 		map = generator.ConstructMapObjects(out mapTiles, out units);
 	}

@@ -6,6 +6,63 @@ using System.Collections;
 public static class Util{
 
 
+    /// <summary>
+	///  Return a normal distribution random double value. Mean will be 0 and standard deviation will be 1.
+	/// </summary>
+	/// <returns>The random gaussian double.</returns>
+	public static double NextGaussianDouble(this System.Random r)
+	{
+		double u, v, S;
+
+		do
+		{
+			u = 2.0 * r.NextDouble() - 1.0;
+			v = 2.0 * r.NextDouble() - 1.0;
+			S = u * u + v * v;
+		}
+		while (S >= 1.0);
+
+		double fac = Math.Sqrt(-2.0 * Math.Log(S) / S);
+		return u * fac;
+	}
+    /// <summary>
+	/// This method made public for unit testing. You normally would not using this method.
+	/// </summary>
+	public static double _projectGaussianRange(double v, double min, double max, double sd){
+		if (v > sd) {
+			v = sd;
+		} else if (v < -sd) {
+			v = -sd;
+		}
+		v = v/sd/2 + 0.5; // scale v to 0 to 1
+		return v * (max - min) + min;
+	}
+	/// <summary>
+	///  Return a normal distribution random double value within the range given
+	///  The generation will first make a gaussian double bounded to the given standard deviation, and then projected to the given range.
+	///  So that the Mean of the result will be (max + min)/2
+	/// </summary>
+	/// <returns>The gaussian range.</returns>
+	/// <param name="min">Minimum.</param>
+	/// <param name="max">Maximun.</param>
+	/// <param name="sd">The standard deviation threshold.</param>
+	public static double NextGaussianRange(this System.Random r, double min, double max, double sd = 3)
+	{
+		double v = r.NextGaussianDouble ();
+		return _projectGaussianRange (v,min, max, sd);
+	}
+    /// <summary>
+	/// Return a normal distribution random int value within the range given
+	/// </summary>
+	/// <returns>The int gaussian range.</returns>
+	/// <param name="min">Minimum.</param>
+	/// <param name="max">Maximun.</param>
+	/// <param name="sd">The standard deviation threshold.</param>
+	public static int NextIntGaussianRange(this System.Random r, int min, double max, double sd = 3)
+	{
+		return (int)Math.Round(r.NextGaussianRange (min, max, sd),MidpointRounding.AwayFromZero);
+	}
+
     public static IEnumerator MoveCameraTo(Camera viewCamera, Transform transform, float duration){
 		Vector3 startingPoint = viewCamera.transform.position;
 
