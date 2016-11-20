@@ -71,14 +71,14 @@ public abstract class MapGenerator: MonoBehaviour{
 				unitGameObjects.Add(generated);
 			}
 		}
-		ConstructBushesColliders(positionFix);
+		ConstructBushesColliders(positionFix, unitGameObjects);
 
 		
 		mapGameObject.transform.position = positionFix;
 		return mapGameObject;
 	}
 
-	void ConstructBushesColliders(Vector3 positionFix){
+	void ConstructBushesColliders(Vector3 positionFix, List<GameObject> unitGameObjects){
 		int width = map.width;
 		int height = map.height;
 
@@ -91,7 +91,7 @@ public abstract class MapGenerator: MonoBehaviour{
 			for(int y = 0; y < height; y++){
 				if(visited[x,y])
 					continue;
-				ConstructBushesCollider(x, y, visited, positionFix);
+				unitGameObjects.Add(ConstructBushesCollider(x, y, visited, positionFix));
 			}
 		}
 	}
