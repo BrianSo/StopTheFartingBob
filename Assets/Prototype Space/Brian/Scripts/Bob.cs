@@ -14,6 +14,7 @@ public class Bob : NetworkBehaviour {
 	public GameObject fartPrefab;
 
 	public AudioClip[] fartingSounds;
+	public AudioClip bigFartSound;
 	AudioSource audioSource;
 
 	CoolDown fartCooldown = new CoolDown(0.5f);
@@ -42,10 +43,41 @@ public class Bob : NetworkBehaviour {
 		ServerFart();
 	}
 
+	[Server]
+	public void BigFart(){
+		Debug.Log("BigFart");
+		RpcBigFart();
+		Game.singleton.IncreasePollutionIndex(3f);
+
+		Vector3 offset = GetBackOffset();
+
+		for(int y = 1; y <= 2; y++){
+			for(float i = -30f;i < 31f;i+=30f){// fart 3 times
+				var fartObj = Instantiate(fartPrefab, transform.position, Quaternion.identity) as GameObject;
+				var fart = fartObj.GetComponent<Fart>();
+				var force = Quaternion.AngleAxis(i, Vector3.up) * offset;
+				fart.rb.AddForce(force * y, ForceMode.Impulse);
+				NetworkServer.Spawn(fartObj);
+			}
+		}
+	}
+	public void RpcBigFart(){
+		audioSource.clip = bigFartSound;
+		audioSource.Play();
+	}
+
 	[ServerCallback]
 	void ServerFart(){
-		Game.singleton.IncreasePollutionIndex(5.5f);
+		Game.singleton.IncreasePollutionIndex(0.5f);
 
+		Vector3 offset = GetBackOffset();
+		var fartObj = Instantiate(fartPrefab, transform.position, Quaternion.identity) as GameObject;
+		var fart = fartObj.GetComponent<Fart>();
+		fart.rb.AddForce(offset, ForceMode.Impulse);
+		NetworkServer.Spawn(fartObj);
+	}
+
+	Vector3 GetBackOffset(){
 		var rot = transform.rotation.eulerAngles.y;
 		Vector3 offset = Vector3.zero;
 		if(rot < 45){
@@ -59,13 +91,8 @@ public class Bob : NetworkBehaviour {
 		}else{
 			offset.z = -1f;
 		}
-		var fartObj = Instantiate(fartPrefab, transform.position, Quaternion.identity) as GameObject;
-		var fart = fartObj.GetComponent<Fart>();
-		fart.rb.AddForce(offset, ForceMode.Impulse);
-		NetworkServer.Spawn(fartObj);
+		return offset;
 	}
-
-
 
 	void OnHealthChange(int hp){
 		healthPoint = hp;
