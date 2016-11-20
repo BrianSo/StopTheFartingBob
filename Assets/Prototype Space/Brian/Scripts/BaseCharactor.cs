@@ -23,16 +23,6 @@ public class BaseCharactor : NetworkUnit {
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
 
-	void OnPlayerChanged(){
-		if(isOwnByLocalPlayer){
-			this.Singleton(ref localCharactor);
-		}
-	}
-
-	void Destroy(){
-		EventOnPlayerChanged -= OnPlayerChanged;
-		this.RemoveSingleton(ref localCharactor);
-	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -53,10 +43,13 @@ public class BaseCharactor : NetworkUnit {
 		var y = Input.GetAxisRaw("Vertical");
 
 
-		// Moving Camera by pixel
-		Vector3 newPos = 0.3f*mousePos + 0.7f*transform.position;
-		Vector3 roundPos = new Vector3(RoundToNearestPixel(newPos.x, viewCamera), 10, RoundToNearestPixel(newPos.z, viewCamera));
-		viewCamera.transform.position = roundPos;
+		if(!gameEnded){
+			// Moving Camera by pixel
+			Vector3 newPos = 0.3f*mousePos + 0.7f*transform.position;
+			Vector3 roundPos = new Vector3(Util.RoundToNearestPixel(newPos.x, viewCamera), 10, Util.RoundToNearestPixel(newPos.z, viewCamera));
+			viewCamera.transform.position = roundPos;
+		}
+		
 
 		rb.velocity = new Vector3(x,0,y) * movementSpeed;
 
@@ -69,15 +62,27 @@ public class BaseCharactor : NetworkUnit {
 	}
 
 	// For Pixel Perfect Camera Movement
-	public static float RoundToNearestPixel(float unityUnits, Camera viewingCamera)
-	{
-		float valueInPixels = (Screen.height / (viewingCamera.orthographicSize * 2)) * unityUnits;
-		valueInPixels = Mathf.Round(valueInPixels);
-		float adjustedUnityUnits = valueInPixels / (Screen.height / (viewingCamera.orthographicSize * 2));
-		return adjustedUnityUnits;
+
+	bool gameEnded = false;
+	void OnGameEnd(){
+		gameEnded = true;
 	}
 
 	void Awake(){
 		EventOnPlayerChanged += OnPlayerChanged;
+		Game.delegateOnGameEnd += OnGameEnd;
+	}
+
+	void OnPlayerChanged(){
+		if(isOwnByLocalPlayer){
+			this.Singleton(ref localCharactor);
+		}
+	}
+
+	void Destroy(){
+		EventOnPlayerChanged -= OnPlayerChanged;
+		Game.delegateOnGameEnd += OnGameEnd;
+		this.RemoveSingleton(ref localCharactor);
+		
 	}
 }

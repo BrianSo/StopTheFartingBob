@@ -170,7 +170,7 @@ public class GameManager : NetworkBehaviour {
 
 		PlaceCharactors();
 		State = GAME_STARTED;
-		this.GetComponent<Game>().enabled = true;
+		this.GetComponent<Game>().StartGame();
 	}
 
 	[ClientRpc]
@@ -195,7 +195,7 @@ public class GameManager : NetworkBehaviour {
 	}
 	void EndGameLocal(){
 		MapManager.singleton.DestroyMap();
-		this.GetComponent<Game>().enabled = false;
+		this.GetComponent<Game>().LeaveGame();
 	}
 
 	void OnGUI(){

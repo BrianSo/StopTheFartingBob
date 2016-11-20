@@ -17,4 +17,18 @@ public class SelfViewController : NetworkBehaviour {
 	void Update () {
 	
 	}
+
+	void OnGameEnd(){
+		mr.enabled = true;
+	}
+
+	void Awake(){
+		Game.delegateOnGameEnd += OnGameEnd;
+	}
+
+	
+	void OnDestroy(){
+		Debug.Log("Destroy Called");
+		Game.delegateOnGameEnd -= OnGameEnd;
+	}
 }

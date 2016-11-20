@@ -44,7 +44,7 @@ public class Bob : NetworkBehaviour {
 
 	[ServerCallback]
 	void ServerFart(){
-		Game.singleton.IncreasePollutionIndex(0.5f);
+		Game.singleton.IncreasePollutionIndex(5.5f);
 
 		var rot = transform.rotation.eulerAngles.y;
 		Vector3 offset = Vector3.zero;
