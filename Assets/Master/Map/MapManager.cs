@@ -52,7 +52,12 @@ public class MapManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		StartCoroutine(Test());
+	}
+	System.Collections.IEnumerator Test(){
+		yield return new WaitForSeconds(0.1f);
+		seed = Time.deltaTime.ToString();
+		GenerateMap();
 	}
 	public string getRandomSeed(){
 		return Time.time.ToString();

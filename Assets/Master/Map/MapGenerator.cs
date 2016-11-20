@@ -22,6 +22,7 @@ public abstract class MapGenerator: MonoBehaviour{
 	protected System.Random random;
 
 	public bool drawGizmo = false;
+	public bool drawSpaceGizmo = false;
 	
 	void Start(){
 		middlewares = new List<MapGenerationMiddleware>();
@@ -195,6 +196,20 @@ public abstract class MapGenerator: MonoBehaviour{
 			foreach(MapGenerationMiddleware middleware in middlewares){
 				middleware.OnDrawGizmos();
 			}
+		}
+		if(drawSpaceGizmo && map != null){
+			int width = map.width;
+			int height = map.height;
+			Gizmos.color = Color.blue;
+			for (int x = 0; x < width; x ++) {
+                for (int y = 0; y < height; y ++) {
+					// draw space
+					if(map.blocks[x,y].tilePlaced){
+						Vector3 pos = new Vector3(-width/2 + x + .5f, 0,-height/2 + y+.5f);
+						Gizmos.DrawCube(pos,Vector3.one);
+					}
+                }
+            }
 		}
     }
 }
