@@ -15,8 +15,7 @@ public class SweetPotato : Item {
 	}
 
 	[Client]
-	public override void ItemEffect(ItemUser user){
-		Debug.Log("SweetPotato Use");
+	public override void ItemEffect(ItemUser user){	
 		CmdItemEffect();
 	}
 
