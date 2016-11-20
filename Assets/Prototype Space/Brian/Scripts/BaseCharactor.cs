@@ -50,8 +50,12 @@ public class BaseCharactor : NetworkUnit {
 			viewCamera.transform.position = roundPos;
 		}
 		
+		if (anim.GetBool ("isAttacking")) {
+			rb.velocity = Vector3.zero;
+		} else {
+			rb.velocity = new Vector3 (x, 0, y) * movementSpeed;
+		}
 
-		rb.velocity = new Vector3(x,0,y) * movementSpeed;
 
 		// For Sprite Animator
 		bool isWalking = (Mathf.Abs (x) + Mathf.Abs (y)) > 0;

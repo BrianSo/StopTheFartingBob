@@ -4,7 +4,7 @@ using System.Collections;
 
 public class Gardener : NetworkBehaviour {
 
-	
+	public Animator anim;
 	public CoolDown attackCooldown;
 	public int attackDamage = 1;
 	public float attackRadius = 0.5f;
@@ -71,13 +71,20 @@ public class Gardener : NetworkBehaviour {
 	[ClientRpc]
 	void RpcAttack(bool isHit){
 		attackCooldown.Reset();
-		//TODO player animation
 
+		//TODO player animation
+		StartCoroutine("PlayAttackAnimation");
 		
 		if(isHit){
 			//maybe play a sound for hit
 		}else{
 			//maybe play a sound for not hit
 		}
+	}
+
+	IEnumerator PlayAttackAnimation() {
+		anim.SetBool ("isAttacking", true);
+		yield return new WaitForSeconds(0.5f);
+		anim.SetBool ("isAttacking", false);
 	}
 }
