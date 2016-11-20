@@ -122,6 +122,7 @@ public class Bob : NetworkBehaviour {
 
 	void OnPlayerChanged(){
 		if(this.IsOwnByLocalPlayer()){
+			//audioSource.volume = 1f;
 			uiControl.ShowHealthImages();
 		}
 	}

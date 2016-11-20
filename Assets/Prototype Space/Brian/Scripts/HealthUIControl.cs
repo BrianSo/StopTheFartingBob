@@ -18,7 +18,6 @@ public class HealthUIControl : MonoBehaviour {
 		Debug.Log("HAHAHHAHAHAHHAHHHA");
 		foreach(Image img in healthImage){
 			img.material = null;
-			Debug.Log(img.material);
 		}
 	}
 
