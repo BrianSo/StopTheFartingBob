@@ -49,20 +49,22 @@ public class BaseCharactor : NetworkUnit {
 			Vector3 roundPos = new Vector3(Util.RoundToNearestPixel(newPos.x, viewCamera), 10, Util.RoundToNearestPixel(newPos.z, viewCamera));
 			viewCamera.transform.position = roundPos;
 		}
-		
-		if (anim.GetBool ("isAttacking")) {
-			rb.velocity = Vector3.zero;
-		} else {
-			rb.velocity = new Vector3 (x, 0, y) * movementSpeed;
-		}
-
 
 		// For Sprite Animator
 		bool isWalking = (Mathf.Abs (x) + Mathf.Abs (y)) > 0;
 		Vector3 lookDirection = (mousePos - transform.position).normalized;
-		anim.SetBool ("isWalking", isWalking);
-		anim.SetFloat ("x", lookDirection.x);
-		anim.SetFloat ("y", lookDirection.z);
+		var isStationary = anim.GetBool ("isAttacking") || anim.GetBool ("isUsing");
+
+		if (isStationary) {
+			rb.velocity = Vector3.zero;
+			anim.SetBool ("isWalking", false);
+		} else {
+			rb.velocity = new Vector3 (x, 0, y) * movementSpeed;
+			anim.SetBool ("isWalking", isWalking);
+			anim.SetFloat ("x", lookDirection.x);
+			anim.SetFloat ("y", lookDirection.z);
+		}
+
 	}
 
 	// For Pixel Perfect Camera Movement
