@@ -6,6 +6,8 @@ public class Bob : NetworkBehaviour {
 
 	public HealthUIControl uiControl;
 
+	public Animator anim;
+
 	[SyncVar(hook="OnHealthChange")]
 	public int healthPoint;
 
@@ -15,9 +17,10 @@ public class Bob : NetworkBehaviour {
 
 	public AudioClip[] fartingSounds;
 	public AudioClip bigFartSound;
+	public AudioClip hitSound;
 	AudioSource audioSource;
 
-	CoolDown fartCooldown = new CoolDown(0.5f);
+	CoolDown fartCooldown = new CoolDown(0.3f);
 
 	// Use this for initialization
 	void Start () {
@@ -115,8 +118,16 @@ public class Bob : NetworkBehaviour {
 	//as it will be synced
 	[ClientRpc]
 	public void RpcGetHurted(int damage){
+		audioSource.clip = hitSound;
+		audioSource.Play ();
+		StartCoroutine ("PlayHitAnimation");
 		Debug.Log("Oh~ I am attacked");
+	}
 
+	IEnumerator PlayHitAnimation() {
+		anim.SetBool ("isHit", true);
+		yield return new WaitForSeconds(1.5f);
+		anim.SetBool ("isHit", false);
 	}
 
 

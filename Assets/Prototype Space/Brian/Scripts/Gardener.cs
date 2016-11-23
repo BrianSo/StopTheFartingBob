@@ -13,6 +13,9 @@ public class Gardener : NetworkBehaviour {
 
 	bool isOwnByLocalPlayer;
 
+	public AudioClip attackSound;
+	AudioSource audioSource;
+
 	// Use this for initialization
 	void Start () {
 		this.isOwnByLocalPlayer = this.IsOwnByLocalPlayer();
@@ -79,6 +82,8 @@ public class Gardener : NetworkBehaviour {
 			//maybe play a sound for hit
 		}else{
 			//maybe play a sound for not hit
+			audioSource.clip = attackSound;
+			audioSource.Play ();
 		}
 	}
 
@@ -86,5 +91,9 @@ public class Gardener : NetworkBehaviour {
 		anim.SetBool ("isAttacking", true);
 		yield return new WaitForSeconds(0.5f);
 		anim.SetBool ("isAttacking", false);
+	}
+
+	void Awake(){
+		audioSource = GetComponent<AudioSource>();
 	}
 }

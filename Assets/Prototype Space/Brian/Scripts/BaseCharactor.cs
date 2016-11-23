@@ -53,7 +53,7 @@ public class BaseCharactor : NetworkUnit {
 		// For Sprite Animator
 		bool isWalking = (Mathf.Abs (x) + Mathf.Abs (y)) > 0;
 		Vector3 lookDirection = (mousePos - transform.position).normalized;
-		var isStationary = anim.GetBool ("isAttacking") || anim.GetBool ("isUsing");
+		var isStationary = anim.GetBool ("isAttacking") || anim.GetBool ("isUsing") || anim.GetBool("isHit");
 
 		if (isStationary) {
 			rb.velocity = Vector3.zero;
