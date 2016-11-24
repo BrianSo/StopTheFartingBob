@@ -4,6 +4,12 @@ using System.Collections;
 
 public class ItemUser : NetworkBehaviour {
 
+	public Animator anim;
+
+	public AudioClip pickUpSound;
+
+	AudioSource audioSource;
+
 	public GameObject itemUI;
 
 	public Item itemCarried;
@@ -43,6 +49,9 @@ public class ItemUser : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcDestoryItemAfterUse(){
+		// Use animation for player
+		StartCoroutine("PlayUseAnimation");
+
 		Destroy(itemCarried.gameObject, 2f);//delay destroy
 		itemCarried = null;
 		if(this.IsOwnByLocalPlayer()){
@@ -76,9 +85,23 @@ public class ItemUser : NetworkBehaviour {
 		if(this.IsOwnByLocalPlayer()){
 			//do UI stuff
 			InGameUIControl.singleton.PickUpItem(itemObj.GetComponentInChildren<SpriteRenderer>().sprite);
+			//play pick up sound
+			audioSource.clip = pickUpSound;
+			audioSource.Play ();
 		}
 		Debug.Log("Going to Destroy item");
 		item.gameObject.SetActive(false);
 		item.ItemDidPickedUp(this);
 	}
+
+	IEnumerator PlayUseAnimation() {
+		anim.SetBool ("isUsing", true);
+		yield return new WaitForSeconds(0.5f);
+		anim.SetBool ("isUsing", false);
+	}
+
+	void Awake(){
+		audioSource = GetComponent<AudioSource>();
+	}
+
 }

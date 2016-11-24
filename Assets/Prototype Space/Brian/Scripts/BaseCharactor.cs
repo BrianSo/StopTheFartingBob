@@ -49,20 +49,22 @@ public class BaseCharactor : NetworkUnit {
 			Vector3 roundPos = new Vector3(Util.RoundToNearestPixel(newPos.x, viewCamera), 10, Util.RoundToNearestPixel(newPos.z, viewCamera));
 			viewCamera.transform.position = roundPos;
 		}
-		
-		if (anim.GetBool ("isAttacking")) {
-			rb.velocity = Vector3.zero;
-		} else {
-			rb.velocity = new Vector3 (x, 0, y) * movementSpeed;
-		}
-
 
 		// For Sprite Animator
 		bool isWalking = (Mathf.Abs (x) + Mathf.Abs (y)) > 0;
 		Vector3 lookDirection = (mousePos - transform.position).normalized;
-		anim.SetBool ("isWalking", isWalking);
-		anim.SetFloat ("x", lookDirection.x);
-		anim.SetFloat ("y", lookDirection.z);
+		var isStationary = anim.GetBool ("isAttacking") || anim.GetBool ("isUsing") || anim.GetBool("isHit");
+
+		if (isStationary) {
+			rb.velocity = Vector3.zero;
+			anim.SetBool ("isWalking", false);
+		} else {
+			rb.velocity = new Vector3 (x, 0, y) * movementSpeed;
+			anim.SetBool ("isWalking", isWalking);
+			anim.SetFloat ("x", lookDirection.x);
+			anim.SetFloat ("y", lookDirection.z);
+		}
+
 	}
 
 	// For Pixel Perfect Camera Movement
@@ -88,5 +90,15 @@ public class BaseCharactor : NetworkUnit {
 		Game.delegateOnGameEnd += OnGameEnd;
 		this.RemoveSingleton(ref localCharactor);
 		
+	}
+
+	public void PlayHitAnimationHelper () {
+		StartCoroutine ("PlayHitAnimation");
+	}
+
+	IEnumerator PlayHitAnimation () {
+		anim.SetBool ("isHit", true);
+		yield return new WaitForSeconds(1.5f);
+		anim.SetBool ("isHit", false);
 	}
 }
