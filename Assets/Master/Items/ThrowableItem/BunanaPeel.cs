@@ -41,5 +41,6 @@ public class BunanaPeel : ThrowingItem {
 		Destroy(gameObject, 2f);
 		Debug.Log("I step on bunanaPeel, T^T");
 		//Play Animation
+		other.GetComponent<BaseCharactor>().PlayHitAnimationHelper();
 	}
 }

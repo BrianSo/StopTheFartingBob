@@ -91,4 +91,14 @@ public class BaseCharactor : NetworkUnit {
 		this.RemoveSingleton(ref localCharactor);
 		
 	}
+
+	public void PlayHitAnimationHelper () {
+		StartCoroutine ("PlayHitAnimation");
+	}
+
+	IEnumerator PlayHitAnimation () {
+		anim.SetBool ("isHit", true);
+		yield return new WaitForSeconds(1.5f);
+		anim.SetBool ("isHit", false);
+	}
 }
