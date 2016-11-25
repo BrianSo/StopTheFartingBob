@@ -8,6 +8,7 @@ public static class BlockStyles{
         new BlockStyle3A(),
         new BlockStyle4(),
         new BlockStyle5(),
+        new BlockStyle5A(),
         new BlockStyle6(),
     };
 }
@@ -385,11 +386,8 @@ public class BlockStyle5 : BlockStyle{
         M = OBJ_THRESHOLD + MapGenerator.OBJ_BUSHES;
         Q = OBJ_THRESHOLD + MapGenerator.OBJ_PLANTS;
         tileObjMap = new int[,] {
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
+            {M,M},
+            {M,M}
         };
 
         X = 0;
@@ -400,11 +398,8 @@ public class BlockStyle5 : BlockStyle{
         Q = 0;
         int K = 1;
         itemMap = new int[,] {
-            {K,M,M,M,M,M},
-            {M,M,M,M,K,M},
-            {M,M,K,M,M,M},
-            {M,M,M,M,M,M},
-            {M,K,M,M,M,M},
+            {K,M},
+            {M,M}
         };
 
         X = 0;
@@ -412,17 +407,65 @@ public class BlockStyle5 : BlockStyle{
         M = 1;
         T = 1;
         blockMap = new int[,] {
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
-            {M,M,M,M,M,M},
+            {M,M},
+            {M,M}
         };
 
         width = tileObjMap.GetLength(0);
         height = tileObjMap.GetLength(1);
     }
 }
+public class BlockStyle5A : BlockStyle{
+
+    public BlockStyle5A(){
+        int _, T, H, M, Q, X;
+
+        X = MapGenerator.TILE_NOTHING;
+        _ = MapGenerator.TILE_GLASS;
+        T = MapGenerator.TILE_WALL_TREE;
+        H = MapGenerator.TILE_WALL_FENCE;
+        M = OBJ_THRESHOLD + MapGenerator.OBJ_BUSHES;
+        Q = OBJ_THRESHOLD + MapGenerator.OBJ_PLANTS;
+        tileObjMap = new int[,] {
+            {M,M,_,M,M},
+            {M,M,_,M,M},
+            {_,_,T,X,X},
+            {M,M,X,X,X},
+            {M,M,X,X,X},
+        };
+
+        X = 0;
+        _ = 0;
+        T = 0;
+        H = 0;
+        M = 0;
+        Q = 0;
+        int K = 1;
+        itemMap = new int[,]  {
+            {M,M,_,M,M},
+            {M,M,K,M,M},
+            {_,K,T,_,_},
+            {M,M,_,M,M},
+            {M,M,_,M,M},
+        };
+
+        X = 0;
+        _ = 0;
+        M = 1;
+        T = 1;
+        blockMap = new int[,]  {
+            {M,M,_,M,M},
+            {M,M,_,M,M},
+            {_,_,_,_,_},
+            {M,M,_,_,_},
+            {M,M,_,_,_},
+        };
+
+        width = tileObjMap.GetLength(0);
+        height = tileObjMap.GetLength(1);
+    }
+}
+
 
 public class BlockStyle6 : BlockStyle{
 
