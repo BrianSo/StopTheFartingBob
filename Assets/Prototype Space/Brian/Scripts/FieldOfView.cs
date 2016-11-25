@@ -45,10 +45,10 @@ public class FieldOfView : NetworkBehaviour {
 	}
 
 	void FindVisibleTargets() {
-		foreach(var target in visibleTargets){
-			var s = target.GetComponent<AudioSource>();
-			if(s)s.volume = 0f;
-		}
+		// foreach(var target in visibleTargets){
+		// 	var s = target.GetComponent<AudioSource>();
+		// 	if(s)s.volume = 0f;
+		// }
 		visibleTargets.Clear ();
 		Collider[] targetsInViewRadius = Physics.OverlapSphere (transform.position, viewRadius, targetMask);
 		for (int i = 0; i < targetsInViewRadius.Length; i++) {
@@ -58,8 +58,8 @@ public class FieldOfView : NetworkBehaviour {
 				float distanceToTarget = Vector3.Distance (transform.position, target.position);
 				if (!Physics.Raycast (transform.position, dirToTarget, distanceToTarget, obstacleMask)) {
 					visibleTargets.Add (target);
-					var s = target.GetComponent<AudioSource>();
-					if(s)s.volume = 1f;
+					// var s = target.GetComponent<AudioSource>();
+					// if(s)s.volume = 1f;
 				}
 			}
 		}
