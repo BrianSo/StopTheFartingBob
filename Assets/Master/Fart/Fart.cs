@@ -11,6 +11,8 @@ public class Fart : NetworkBehaviour {
 
 	public Material spriteMaterial;
 
+	bool isAte = false;
+
 	void Awake(){
 		rb = GetComponent<Rigidbody>();
 	}
@@ -56,6 +58,16 @@ public class Fart : NetworkBehaviour {
 
 
 		yield return null;
+	}
+
+	void OnTriggerEnter(Collider other){
+		if(isAte)
+			return;
+		Gardener gardener = other.GetComponent<Gardener>();
+		if(gardener != null){
+			gardener.EatFart();
+			isAte = true;
+		}
 	}
 
 	// Update is called once per frame

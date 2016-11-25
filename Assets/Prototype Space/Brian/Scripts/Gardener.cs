@@ -11,6 +11,10 @@ public class Gardener : NetworkBehaviour {
 	public float attackRange = 1.0f;
 	public LayerMask attackLayer;
 
+	[SyncVar]
+	public float numOfFartAte = 0;
+	public const float FART_STUNNING_THRESHOLD = 10;
+
 	bool isOwnByLocalPlayer;
 
 	public AudioClip attackSound;
@@ -29,6 +33,12 @@ public class Gardener : NetworkBehaviour {
 			var leftClick = Input.GetMouseButtonDown(0);
 			if(leftClick && attackCooldown.IsReady()){
 				CmdAttack(Util.MousePositionInWorld);
+			}
+		}
+		if(isServer){
+			numOfFartAte-=Time.deltaTime;
+			if(numOfFartAte < 0){
+				numOfFartAte = 0;
 			}
 		}
 	}
@@ -95,5 +105,20 @@ public class Gardener : NetworkBehaviour {
 
 	void Awake(){
 		audioSource = GetComponent<AudioSource>();
+	}
+
+	public void EatFart(){
+		if(isServer){
+			numOfFartAte+=1;
+			if(numOfFartAte >= FART_STUNNING_THRESHOLD){
+				numOfFartAte = 0;
+				RpcStunning();
+			}
+		}
+	}
+
+	[ClientRpc]
+	public void RpcStunning(){
+		GetComponent<BaseCharactor>().PlayHitAnimationHelper();
 	}
 }
