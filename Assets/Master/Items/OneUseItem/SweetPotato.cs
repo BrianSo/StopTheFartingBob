@@ -24,7 +24,8 @@ public class SweetPotato : Item {
 		
 		var bob = owner.GetComponent<Bob>();
 		if(bob != null){
-			bob.healthPoint += 1;
+			if(bob.healthPoint < 3)
+				bob.healthPoint += 1;
 			bob.BigFart();
 		}
 	}
