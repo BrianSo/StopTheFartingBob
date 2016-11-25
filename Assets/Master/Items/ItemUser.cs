@@ -16,6 +16,8 @@ public class ItemUser : NetworkBehaviour {
 
 	const int RIGHT_CLICK = 1;
 
+	public GameObject itemUsedHintPrefab;
+
 	NetworkUnit unit;
 	// Use this for initialization
 	void Start () {
@@ -51,6 +53,7 @@ public class ItemUser : NetworkBehaviour {
 	void RpcDestoryItemAfterUse(){
 		// Use animation for player
 		StartCoroutine("PlayUseAnimation");
+		StartCoroutine(PlayItemUsedHintAnimation(itemCarried));
 
 		Destroy(itemCarried.gameObject, 2f);//delay destroy
 		itemCarried = null;
@@ -98,6 +101,15 @@ public class ItemUser : NetworkBehaviour {
 		anim.SetBool ("isUsing", true);
 		yield return new WaitForSeconds(0.5f);
 		anim.SetBool ("isUsing", false);
+	}
+	IEnumerator PlayItemUsedHintAnimation(Item itemCarried){
+		Sprite itemSprite = itemCarried.GetComponentInChildren<SpriteRenderer>().sprite;
+		
+		for(var i = 0; i < 2; i++){
+			var hint = Instantiate(itemUsedHintPrefab, transform.position, Quaternion.identity) as GameObject;
+			hint.GetComponent<SpriteRenderer>().sprite = itemSprite;
+			yield return new WaitForSeconds(0.1f);
+		}
 	}
 
 	void Awake(){

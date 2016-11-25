@@ -6,6 +6,7 @@ public class BunanaPeel : ThrowingItem {
 
 
 	new SphereCollider collider;
+	public SpriteRenderer dangerousHintRenderer;
 
 	
 	protected override void Awake(){
@@ -25,6 +26,7 @@ public class BunanaPeel : ThrowingItem {
 	public override void OnItemArrived(){
 		collider.isTrigger = true;
 		collider.enabled = true;
+		dangerousHintRenderer.enabled = true;
 	}
 
 	[ServerCallback]
