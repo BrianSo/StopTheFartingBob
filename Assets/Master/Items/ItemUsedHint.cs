@@ -6,6 +6,7 @@ public class ItemUsedHint : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		transform.localScale = Vector3.one * 0.6f;
+		transform.rotation = Quaternion.Euler(90,0,0);
 		StartCoroutine(ItemUsedAnimation());
 	}
 
