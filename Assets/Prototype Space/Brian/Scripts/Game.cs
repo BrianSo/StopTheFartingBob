@@ -165,6 +165,7 @@ public class Game : NetworkBehaviour {
 		if(delegateOnGameFinish != null)
 			delegateOnGameFinish();
 
+		InGameUIControl.singleton.ShowBobWin();
 		yield return new WaitForSeconds(3f);
 
 		MyNetworkManager.singleton.Disconnect();
@@ -182,6 +183,8 @@ public class Game : NetworkBehaviour {
 		//show end game ui
 		if(delegateOnGameFinish != null)
 			delegateOnGameFinish();
+
+		InGameUIControl.singleton.ShowGardenerWin();
 
 		yield return new WaitForSeconds(3f);
 

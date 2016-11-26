@@ -14,6 +14,9 @@ public class InGameUIControl : MonoBehaviour {
 	private float indicatorXOffset;
 	private float indexBarHeight;
 
+	public GameObject bobWinTitle;
+	public GameObject gardenerWinTitle;
+
 
 	// Use this for initialization
 	void Start () {
@@ -25,10 +28,18 @@ public class InGameUIControl : MonoBehaviour {
 	}
 	public void HideUI(){
 		gameObject.SetActive(false);
+		bobWinTitle.SetActive(false);
+		gardenerWinTitle.SetActive(false);
 	}
 	public void PickUpItem(Sprite itemSprite){
 		itemSlotDisplay.sprite = itemSprite;
 		itemSlotDisplay.enabled = true;
+	}
+	public void ShowBobWin(){
+		bobWinTitle.SetActive(true);
+	}
+	public void ShowGardenerWin(){
+		gardenerWinTitle.SetActive(true);
 	}
 
 	public void RemoveItem(){
