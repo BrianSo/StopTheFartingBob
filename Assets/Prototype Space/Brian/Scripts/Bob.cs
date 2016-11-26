@@ -71,7 +71,7 @@ public class Bob : NetworkBehaviour {
 
 	[ServerCallback]
 	void ServerFart(){
-		Game.singleton.IncreasePollutionIndex(0.5f);
+		Game.singleton.IncreasePollutionIndex(0.4f);
 
 		Vector3 offset = GetBackOffset();
 		var fartObj = Instantiate(fartPrefab, transform.position, Quaternion.identity) as GameObject;
