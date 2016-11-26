@@ -38,7 +38,7 @@ public class UIFart : MonoBehaviour {
 			spriteRenderer.color = c;
 			yield return null;
 		}
-		//Destroy(gameObject);
+		Destroy(gameObject);
 
 
 		yield return null;
