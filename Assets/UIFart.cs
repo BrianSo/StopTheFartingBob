@@ -11,7 +11,7 @@ public class UIFart : MonoBehaviour {
 		System.Random rand = new System.Random();
 		transform.rotation = Quaternion.Euler(0,0,(float)rand.NextDouble() * 360f);
 		StartCoroutine(FartAnimation());
-		GetComponent<Rigidbody>().AddForce(new Vector3(Screen.width * 0.1f,0,0), ForceMode.Impulse);
+		GetComponent<Rigidbody>().AddForce(new Vector3(Screen.width * 0.2f,0,0), ForceMode.Impulse);
 	}
 	
 	// Update is called once per frame

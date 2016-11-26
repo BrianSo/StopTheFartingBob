@@ -9,7 +9,7 @@ public class MainMenuFartSpawner : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		fartTimer = new CoolDown(0.5f);
+		fartTimer = new CoolDown(0.3f);
 	}
 	
 	// Update is called once per frame
