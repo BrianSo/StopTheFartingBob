@@ -8,10 +8,12 @@ public class InGameUIControl : MonoBehaviour {
 
 	public RectTransform indexIndicator;
 	public RectTransform indexBar;
+	public Text indexPercentage;
 
 	public Image itemSlotDisplay;
 	private float indicatorXOffset;
 	private float indexBarHeight;
+
 
 	// Use this for initialization
 	void Start () {
@@ -39,6 +41,7 @@ public class InGameUIControl : MonoBehaviour {
 
 			//Update index
 			indexIndicator.localPosition = new Vector3(indicatorXOffset,Game.singleton.pollutionIndex*0.01f*indexBarHeight - indexBarHeight*0.5f,0);
+			indexPercentage.text = Mathf.Round (Game.singleton.pollutionIndex) + "%";
 		}
 	}
 
