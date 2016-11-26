@@ -16,6 +16,9 @@ public class BaseCharactor : NetworkUnit {
 	Vector3 mousePos;
 	Camera viewCamera;
 
+	public AudioClip takeDamageSound;
+	AudioSource audioSource;
+
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
@@ -77,6 +80,7 @@ public class BaseCharactor : NetworkUnit {
 	void Awake(){
 		EventOnPlayerChanged += OnPlayerChanged;
 		Game.delegateOnGameEnd += OnGameEnd;
+		audioSource = GetComponent<AudioSource>();
 	}
 
 	void OnPlayerChanged(){
@@ -98,6 +102,8 @@ public class BaseCharactor : NetworkUnit {
 
 	IEnumerator PlayHitAnimation () {
 		anim.SetBool ("isHit", true);
+		audioSource.clip = takeDamageSound;
+		audioSource.Play ();
 		yield return new WaitForSeconds(1.5f);
 		anim.SetBool ("isHit", false);
 	}
