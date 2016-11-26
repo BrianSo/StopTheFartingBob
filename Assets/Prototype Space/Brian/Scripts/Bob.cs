@@ -18,6 +18,7 @@ public class Bob : NetworkBehaviour {
 	public AudioClip[] fartingSounds;
 	public AudioClip bigFartSound;
 	public AudioClip hitSound;
+	public AudioClip takeDamageSound;
 	AudioSource audioSource;
 
 	CoolDown fartCooldown = new CoolDown(0.3f);
@@ -127,6 +128,9 @@ public class Bob : NetworkBehaviour {
 	IEnumerator PlayHitAnimation() {
 		anim.SetBool ("isHit", true);
 		yield return new WaitForSeconds(0.5f);
+		audioSource.clip = takeDamageSound;
+		audioSource.Play ();
+		yield return new WaitForSeconds(0.3f);
 		anim.SetBool ("isHit", false);
 	}
 
