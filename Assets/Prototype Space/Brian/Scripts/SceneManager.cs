@@ -33,7 +33,7 @@ public class SceneManager : MonoBehaviour {
 	}
 
 	void OnGUI(){
-		GUI.TextArea(new Rect(10, 10, 15, 20), "" + _state);
+		//GUI.TextArea(new Rect(10, 10, 15, 20), "" + _state);
 	}
 
 	void OnStateChange(int state){

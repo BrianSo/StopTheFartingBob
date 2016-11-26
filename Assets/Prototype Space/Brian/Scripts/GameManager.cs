@@ -63,7 +63,7 @@ public class GameManager : NetworkBehaviour {
 		//assign charactor to player
 		if(bobPlayer == null && gardenerPlayer == null){
 			//random assign
-			if(Random.Range(0,1) == 1){
+			if(Random.Range(0,2) == 1){
 				player.GetComponent<Player>().charactor = Player.BOB;
 				bobPlayer = player;
 			}else{
@@ -208,17 +208,17 @@ public class GameManager : NetworkBehaviour {
 		this.GetComponent<Game>().LeaveGame();
 	}
 
-	void OnGUI(){
-		GUI.TextArea(new Rect(30,10,15,20), "" + _state);
-		if(GUI.Button(new Rect(45,10,30,20), "rpc")){
-			RpcCall();
-		}
-		if(GUI.Button(new Rect(75,10,30,20), "cmd")){
-			CmdCommand();
-		}
-		if(Time.time < lastTime + 3)
-			GUI.TextArea(new Rect(30,30,40,20), message);
-	}
+	// void OnGUI(){
+	// 	GUI.TextArea(new Rect(30,10,15,20), "" + _state);
+	// 	if(GUI.Button(new Rect(45,10,30,20), "rpc")){
+	// 		RpcCall();
+	// 	}
+	// 	if(GUI.Button(new Rect(75,10,30,20), "cmd")){
+	// 		CmdCommand();
+	// 	}
+	// 	if(Time.time < lastTime + 3)
+	// 		GUI.TextArea(new Rect(30,30,40,20), message);
+	// }
 
 	string message = "";
 	float lastTime = 0;
