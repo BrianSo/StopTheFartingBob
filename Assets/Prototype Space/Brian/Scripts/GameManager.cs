@@ -204,8 +204,8 @@ public class GameManager : NetworkBehaviour {
 		EndGameLocal();
 	}
 	void EndGameLocal(){
-		MapManager.singleton.DestroyMap();
 		this.GetComponent<Game>().LeaveGame();
+		MapManager.singleton.GenerateMap();
 	}
 
 	// void OnGUI(){
