@@ -126,7 +126,7 @@ public class Bob : NetworkBehaviour {
 
 	IEnumerator PlayHitAnimation() {
 		anim.SetBool ("isHit", true);
-		yield return new WaitForSeconds(1.5f);
+		yield return new WaitForSeconds(0.5f);
 		anim.SetBool ("isHit", false);
 	}
 
