@@ -43,4 +43,7 @@ public class UIFart : MonoBehaviour {
 
 		yield return null;
 	}
+	void OnDisable(){
+		Destroy(gameObject);
+	}
 }
