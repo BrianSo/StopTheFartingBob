@@ -58,7 +58,7 @@ public class BaseCharactor : NetworkUnit {
 		Vector3 lookDirection = (mousePos - transform.position).normalized;
 		var isStationary = anim.GetBool ("isAttacking") || anim.GetBool ("isUsing") || anim.GetBool("isHit");
 
-		if (isStationary) {
+		if (isStationary || gameEnded) {
 			rb.velocity = Vector3.zero;
 			anim.SetBool ("isWalking", false);
 		} else {
