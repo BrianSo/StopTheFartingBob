@@ -22,7 +22,7 @@ public class Game : NetworkBehaviour {
 
 	public static Game singleton;
 
-	public float itemGenerationInterval = 1f;
+	public float itemGenerationInterval = 6f;
 	private float randomItemTimer;
 
 	public bool isGameStarted = false;
@@ -47,6 +47,14 @@ public class Game : NetworkBehaviour {
 		InGameUIControl.singleton.ShowUI();
 		if(delegateOnGameStart!=null)
 			delegateOnGameStart();
+
+		if(isServer){
+			for(int i = 0, try_time = 0; i < 5 && try_time < 20;try_time++){
+				if(GenerateItem()){
+					i++;
+				}
+			}
+		}
 	}
 	public void LeaveGame(){
 		this.enabled = false;
@@ -71,10 +79,32 @@ public class Game : NetworkBehaviour {
 			randomItemTimer = itemGenerationInterval;
 
 			// place new item
-			var prefab = ItemsPool.GetRandomItemPrefab();
-			var obj = Instantiate(prefab, MapManager.singleton.GetItemPosition(), Quaternion.identity) as GameObject;
-			NetworkServer.Spawn(obj);
+			GenerateItem();
 		}
+	}
+	[Server]
+	bool GenerateItem(){
+		var position = MapManager.singleton.GetItemPosition();
+		var ok = true;
+
+		//test whether there is a item already
+		Collider[] hits = Physics.OverlapSphere(position, 0.5f);
+		foreach(var collider in hits){
+			if(collider.gameObject.CompareTag("Item")){
+				ok = false;
+			}
+		}
+
+		if(ok){
+			var prefab = ItemsPool.GetRandomItemPrefab();
+			var obj = Instantiate(prefab, position, Quaternion.identity) as GameObject;
+			NetworkServer.Spawn(obj);
+			Debug.Log("PLACE ITEM OK");
+		}else{
+			randomItemTimer = 1f;
+			Debug.Log("PLACE ITEM NOT OK");
+		}
+		return ok;
 	}
 
 	void OnPollutionIndexChanged(float val){
