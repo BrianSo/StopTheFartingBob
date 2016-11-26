@@ -127,7 +127,7 @@ public class Bob : NetworkBehaviour {
 
 	IEnumerator PlayHitAnimation() {
 		anim.SetBool ("isHit", true);
-		yield return new WaitForSeconds(0.5f);
+		yield return new WaitForSeconds(0.3f);
 		audioSource.clip = takeDamageSound;
 		audioSource.Play ();
 		yield return new WaitForSeconds(0.3f);

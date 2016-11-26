@@ -99,7 +99,7 @@ public class Gardener : NetworkBehaviour {
 
 	IEnumerator PlayAttackAnimation() {
 		anim.SetBool ("isAttacking", true);
-		yield return new WaitForSeconds(1f);
+		yield return new WaitForSeconds(1.2f);
 		anim.SetBool ("isAttacking", false);
 	}
 
