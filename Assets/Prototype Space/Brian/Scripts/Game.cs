@@ -37,6 +37,7 @@ public class Game : NetworkBehaviour {
 		this.RemoveSingleton(ref singleton);
 	}
 
+	[Client]
 	public void StartGame(){
 		this.enabled = true;
 		Camera.main.GetComponent<AtomsphereControl>().enabled = true;
@@ -45,8 +46,9 @@ public class Game : NetworkBehaviour {
 		randomItemTimer = itemGenerationInterval;
 		isGameStarted = true;
 		InGameUIControl.singleton.ShowUI();
+		InGameUIControl.singleton.RemoveItem();
 		if(delegateOnGameStart!=null)
-			delegateOnGameStart();
+			delegateOnGameStart();	
 
 		if(isServer){
 			for(int i = 0, try_time = 0; i < 5 && try_time < 20;try_time++){

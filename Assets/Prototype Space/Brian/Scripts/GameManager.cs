@@ -61,7 +61,17 @@ public class GameManager : NetworkBehaviour {
 
 	public void OnServerAddPlayer(GameObject player){
 		//assign charactor to player
-		if(bobPlayer == null){
+		if(bobPlayer == null && gardenerPlayer == null){
+			//random assign
+			if(Random.Range(0,1) == 1){
+				player.GetComponent<Player>().charactor = Player.BOB;
+				bobPlayer = player;
+			}else{
+				player.GetComponent<Player>().charactor = Player.GARNDERER;
+				gardenerPlayer = player;
+			}
+
+		}else if(bobPlayer == null){
 			player.GetComponent<Player>().charactor = Player.BOB;
 			bobPlayer = player;
 		}else if(gardenerPlayer == null){
