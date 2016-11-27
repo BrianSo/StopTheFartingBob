@@ -7,6 +7,7 @@ public class MapManagerEditor: Editor{
         DrawDefaultInspector();
         MapManager manager = (MapManager) target;
         if(GUILayout.Button("Generate Map")){
+            manager.seed = manager.getRandomSeed();
             manager.GenerateMap();
         }
         if(GUILayout.Button("Destroy Map")){

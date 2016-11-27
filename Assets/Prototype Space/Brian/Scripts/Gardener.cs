@@ -4,14 +4,21 @@ using System.Collections;
 
 public class Gardener : NetworkBehaviour {
 
-	
+	public Animator anim;
 	public CoolDown attackCooldown;
 	public int attackDamage = 1;
 	public float attackRadius = 0.5f;
 	public float attackRange = 1.0f;
 	public LayerMask attackLayer;
 
+	[SyncVar]
+	public float numOfFartAte = 0;
+	public const float FART_STUNNING_THRESHOLD = 10;
+
 	bool isOwnByLocalPlayer;
+
+	public AudioClip attackSound;
+	AudioSource audioSource;
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +33,12 @@ public class Gardener : NetworkBehaviour {
 			var leftClick = Input.GetMouseButtonDown(0);
 			if(leftClick && attackCooldown.IsReady()){
 				CmdAttack(Util.MousePositionInWorld);
+			}
+		}
+		if(isServer){
+			numOfFartAte-=Time.deltaTime;
+			if(numOfFartAte < 0){
+				numOfFartAte = 0;
 			}
 		}
 	}
@@ -71,13 +84,41 @@ public class Gardener : NetworkBehaviour {
 	[ClientRpc]
 	void RpcAttack(bool isHit){
 		attackCooldown.Reset();
-		//TODO player animation
 
+		//TODO player animation
+		StartCoroutine("PlayAttackAnimation");
 		
 		if(isHit){
 			//maybe play a sound for hit
 		}else{
 			//maybe play a sound for not hit
+			audioSource.clip = attackSound;
+			audioSource.Play ();
 		}
+	}
+
+	IEnumerator PlayAttackAnimation() {
+		anim.SetBool ("isAttacking", true);
+		yield return new WaitForSeconds(1.2f);
+		anim.SetBool ("isAttacking", false);
+	}
+
+	void Awake(){
+		audioSource = GetComponent<AudioSource>();
+	}
+
+	public void EatFart(){
+		if(isServer){
+			numOfFartAte+=1;
+			if(numOfFartAte >= FART_STUNNING_THRESHOLD){
+				numOfFartAte = 0;
+				RpcStunning();
+			}
+		}
+	}
+
+	[ClientRpc]
+	public void RpcStunning(){
+		GetComponent<BaseCharactor>().PlayHitAnimationHelper();
 	}
 }

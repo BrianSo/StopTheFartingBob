@@ -14,9 +14,9 @@ public class ConnectionUIController : MonoBehaviour {
 	}
 
 	public void HostDisconnectClick(){
-		MyNetworkManager.singleton.StopHost();
+		MyNetworkManager.singleton.Disconnect();
 	}
 	public void ClientDisconnectClick(){
-		MyNetworkManager.singleton.StopClient();
+		MyNetworkManager.singleton.Disconnect();
 	}
 }

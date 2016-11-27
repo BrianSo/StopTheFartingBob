@@ -42,6 +42,17 @@ class MyNetworkManager : NetworkManager{
         isHost = false;
         return base.StartClient();
     }
+
+    public void Disconnect(){
+        if(isHost){
+            this.StopHost();
+        }else{
+            this.StopClient();
+        }
+    }
+
+
+
     public override void OnStartHost(){
         base.OnStartHost();
         if(delegateOnStartHost != null)

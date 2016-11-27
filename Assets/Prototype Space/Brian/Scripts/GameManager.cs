@@ -61,7 +61,17 @@ public class GameManager : NetworkBehaviour {
 
 	public void OnServerAddPlayer(GameObject player){
 		//assign charactor to player
-		if(bobPlayer == null){
+		if(bobPlayer == null && gardenerPlayer == null){
+			//random assign
+			if(Random.Range(0,2) == 1){
+				player.GetComponent<Player>().charactor = Player.BOB;
+				bobPlayer = player;
+			}else{
+				player.GetComponent<Player>().charactor = Player.GARNDERER;
+				gardenerPlayer = player;
+			}
+
+		}else if(bobPlayer == null){
 			player.GetComponent<Player>().charactor = Player.BOB;
 			bobPlayer = player;
 		}else if(gardenerPlayer == null){
@@ -170,7 +180,7 @@ public class GameManager : NetworkBehaviour {
 
 		PlaceCharactors();
 		State = GAME_STARTED;
-		this.GetComponent<Game>().enabled = true;
+		this.GetComponent<Game>().StartGame();
 	}
 
 	[ClientRpc]
@@ -194,21 +204,21 @@ public class GameManager : NetworkBehaviour {
 		EndGameLocal();
 	}
 	void EndGameLocal(){
-		MapManager.singleton.DestroyMap();
-		this.GetComponent<Game>().enabled = false;
+		this.GetComponent<Game>().LeaveGame();
+		MapManager.singleton.GenerateMap();
 	}
 
-	void OnGUI(){
-		GUI.TextArea(new Rect(30,10,15,20), "" + _state);
-		if(GUI.Button(new Rect(45,10,30,20), "rpc")){
-			RpcCall();
-		}
-		if(GUI.Button(new Rect(75,10,30,20), "cmd")){
-			CmdCommand();
-		}
-		if(Time.time < lastTime + 3)
-			GUI.TextArea(new Rect(30,30,40,20), message);
-	}
+	// void OnGUI(){
+	// 	GUI.TextArea(new Rect(30,10,15,20), "" + _state);
+	// 	if(GUI.Button(new Rect(45,10,30,20), "rpc")){
+	// 		RpcCall();
+	// 	}
+	// 	if(GUI.Button(new Rect(75,10,30,20), "cmd")){
+	// 		CmdCommand();
+	// 	}
+	// 	if(Time.time < lastTime + 3)
+	// 		GUI.TextArea(new Rect(30,30,40,20), message);
+	// }
 
 	string message = "";
 	float lastTime = 0;

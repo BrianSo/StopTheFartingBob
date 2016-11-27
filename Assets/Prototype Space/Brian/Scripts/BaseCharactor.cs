@@ -7,6 +7,7 @@ public class BaseCharactor : NetworkUnit {
 
 	public static BaseCharactor localCharactor;
 
+	public Animator anim;
 	public float movementSpeed = 5f;
 
 
@@ -15,6 +16,9 @@ public class BaseCharactor : NetworkUnit {
 	Vector3 mousePos;
 	Camera viewCamera;
 
+	public AudioClip takeDamageSound;
+	AudioSource audioSource;
+
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody>();
@@ -22,15 +26,6 @@ public class BaseCharactor : NetworkUnit {
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
 
-	protected override void OnPlayerChanged(){
-		if(isOwnByLocalPlayer){
-			this.Singleton(ref localCharactor);
-		}
-	}
-
-	void Destroy(){
-		this.RemoveSingleton(ref localCharactor);
-	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -50,9 +45,66 @@ public class BaseCharactor : NetworkUnit {
 		var x = Input.GetAxisRaw("Horizontal");
 		var y = Input.GetAxisRaw("Vertical");
 
-		viewCamera.transform.position = 0.3f*mousePos + 0.7f*transform.position;
-		viewCamera.transform.position = new Vector3(viewCamera.transform.position.x, 10, viewCamera.transform.position.z);
 
-		rb.velocity = new Vector3(x,0,y) * movementSpeed;
+		if(!gameEnded){
+			// Moving Camera by pixel
+			Vector3 newPos = 0.3f*mousePos + 0.7f*transform.position;
+			Vector3 roundPos = new Vector3(Util.RoundToNearestPixel(newPos.x, viewCamera), 10, Util.RoundToNearestPixel(newPos.z, viewCamera));
+			viewCamera.transform.position = roundPos;
+		}
+
+		// For Sprite Animator
+		bool isWalking = (Mathf.Abs (x) + Mathf.Abs (y)) > 0;
+		Vector3 lookDirection = (mousePos - transform.position).normalized;
+		var isStationary = anim.GetBool ("isAttacking") || anim.GetBool ("isUsing") || anim.GetBool("isHit");
+
+		if (isStationary || gameEnded) {
+			rb.velocity = Vector3.zero;
+			anim.SetBool ("isWalking", false);
+		} else {
+			rb.velocity = new Vector3 (x, 0, y) * movementSpeed;
+			anim.SetBool ("isWalking", isWalking);
+			anim.SetFloat ("x", lookDirection.x);
+			anim.SetFloat ("y", lookDirection.z);
+		}
+
+	}
+
+	// For Pixel Perfect Camera Movement
+
+	bool gameEnded = false;
+	void OnGameEnd(){
+		gameEnded = true;
+	}
+
+	void Awake(){
+		EventOnPlayerChanged += OnPlayerChanged;
+		Game.delegateOnGameEnd += OnGameEnd;
+		audioSource = GetComponent<AudioSource>();
+	}
+
+	void OnPlayerChanged(){
+		if(isOwnByLocalPlayer){
+			this.Singleton(ref localCharactor);
+		}
+	}
+
+	void Destroy(){
+		EventOnPlayerChanged -= OnPlayerChanged;
+		Game.delegateOnGameEnd += OnGameEnd;
+		this.RemoveSingleton(ref localCharactor);
+		
+	}
+
+	public void PlayHitAnimationHelper () {
+		StartCoroutine ("PlayHitAnimation");
+	}
+
+	IEnumerator PlayHitAnimation () {
+		anim.SetBool ("isHit", true);
+		audioSource.clip = takeDamageSound;
+		audioSource.Play ();
+		yield return new WaitForSeconds(1.5f);
+		anim.SetBool ("isHit", false);
 	}
 }
