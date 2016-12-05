@@ -1,5 +1,4 @@
 # 1 Getting Started
-
 **To get started working with the project**
  1. `git clone https://github.com/BrianSo/StopTheFartingBob.git`
  2. Start working by opening the project using Unity3D 5 or above
@@ -7,6 +6,17 @@
 **To compile the project**
  1. Open the project using Unity3D 5 or above
  2. On the Unity menu, click build and select appropriate platform to build.
+
+## File Structure
+
+All main files are placed under `/Assets/Master`  
+`/Assets/Master/FieldOfView` for the visible area  
+`/Assets/Master/Game` for the main game logic  
+`/Assets/Master/GameSystem` for the management of the game flow  
+`/Assets/Master/Items` for the items in game  
+`/Assets/Master/Map` for map tiles and map generation  
+`/Assets/Master/Scripts` for general scripts  
+`/Assets/Master/UI` for ui stuffs  
 
 # 2 Project description
 ## 1 Presentation Slide
