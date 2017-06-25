@@ -31,9 +31,14 @@ public class ItemUser : NetworkBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(IsOwnByLocalPlayer()){
-
+#if UNITY_ANDROID || UNITY_IOS
+			// use item using double tap
+			if(DoubleTap.occurred && itemCarried != null){
+				Util.updateMousePositionByTouch(DoubleTap.tap);
+#else
 			// use item using right click
 			if(Input.GetMouseButtonDown(RIGHT_CLICK) && itemCarried != null){
+#endif
 				if(itemCarried.ItemWillUse(this)){
 
 					itemCarried.ItemEffect(this);

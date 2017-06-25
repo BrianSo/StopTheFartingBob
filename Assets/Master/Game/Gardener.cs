@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using CnControls;
 
 public class Gardener : NetworkBehaviour {
 
@@ -30,7 +31,11 @@ public class Gardener : NetworkBehaviour {
 		attackCooldown.Update();
 
 		if(isOwnByLocalPlayer){
+#if UNITY_ANDROID || UNITY_IOS
+			var leftClick = CnInputManager.GetButton("Jump");
+#else
 			var leftClick = Input.GetMouseButtonDown(0);
+#endif
 			if(leftClick && attackCooldown.IsReady()){
 				CmdAttack(Util.MousePositionInWorld);
 			}

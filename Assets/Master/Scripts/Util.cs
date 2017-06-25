@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System;
 using System.Collections;
+using CnControls;
 
 public static class Util{
 
@@ -130,6 +131,7 @@ public static class Util{
 
     private static Vector3 mousePos;
     private static float lastUpdateTime;
+	private static Vector2 lastFacing;
     public static Vector3 MousePositionInWorld{
         get{
             if(lastUpdateTime == Time.time){
@@ -137,8 +139,27 @@ public static class Util{
             }
             lastUpdateTime = Time.time;
             var viewCamera = Camera.main;
+#if UNITY_ANDROID || UNITY_IOS
+			if (BaseCharactor.localCharactor != null){
+				var x = CnInputManager.GetAxisRaw("FacingHorizontal");
+				var y = CnInputManager.GetAxisRaw("FacingVertical");
+				if(Mathf.Abs(x) > 0.01f || Mathf.Abs(y) > 0.01f){
+					lastFacing = new Vector2(x,y);
+				}
+				mousePos = BaseCharactor.localCharactor.transform.position + new Vector3(lastFacing.x, 0, lastFacing.y) * 2;
+			}else{
+				mousePos = Vector3.zero;
+			}
+
+#else
             mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
+#endif
             return mousePos;
         }
     }
+
+	public static void updateMousePositionByTouch(Touch touch){
+		lastUpdateTime = Time.time;
+		mousePos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.transform.position.y));
+	}
 }

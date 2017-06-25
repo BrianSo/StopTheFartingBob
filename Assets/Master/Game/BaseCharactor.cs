@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using CnControls;
 
 /// The Base Class that all charactor will be inherited
 public class BaseCharactor : NetworkUnit {
@@ -26,11 +27,20 @@ public class BaseCharactor : NetworkUnit {
 		//mainCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 	}
 
-	
+	public Vector2 lastFacing;
 	// Update is called once per frame
 	void Update () {
 		if(isOwnByLocalPlayer){
+#if UNITY_ANDROID || UNITY_IOS
+			var x = CnInputManager.GetAxisRaw("FacingHorizontal");
+			var y = CnInputManager.GetAxisRaw("FacingVertical");
+			if(Mathf.Abs(x) > 0.01f || Mathf.Abs(y) > 0.01f){
+				lastFacing = new Vector2(x,y);
+			}
+			mousePos = transform.position + new Vector3(lastFacing.x, 0, lastFacing.y) * 2;
+#else
 			mousePos = viewCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, viewCamera.transform.position.y));
+#endif
 			transform.LookAt (mousePos + Vector3.up * transform.position.y);
 		}
 	}
@@ -42,9 +52,8 @@ public class BaseCharactor : NetworkUnit {
 	}
 
 	void HandleControl(){
-		var x = Input.GetAxisRaw("Horizontal");
-		var y = Input.GetAxisRaw("Vertical");
-
+		var x = CnInputManager.GetAxisRaw("Horizontal");
+		var y = CnInputManager.GetAxisRaw("Vertical");
 
 		if(!gameEnded){
 			// Moving Camera by pixel
