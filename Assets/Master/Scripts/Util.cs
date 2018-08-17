@@ -141,8 +141,10 @@ public static class Util{
             var viewCamera = Camera.main;
 #if UNITY_ANDROID || UNITY_IOS
 			if (BaseCharactor.localCharactor != null){
-				var x = CnInputManager.GetAxisRaw("FacingHorizontal");
-				var y = CnInputManager.GetAxisRaw("FacingVertical");
+				var x = CnInputManager.GetAxisRaw("Horizontal");
+				var y = CnInputManager.GetAxisRaw("Vertical");
+//				var x = Input.acceleration.x;
+//				var y = Input.acceleration.y;
 				if(Mathf.Abs(x) > 0.01f || Mathf.Abs(y) > 0.01f){
 					lastFacing = new Vector2(x,y);
 				}
